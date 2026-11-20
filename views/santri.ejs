@@ -1,0 +1,166 @@
+﻿<%- include("partials/head") %>
+<%- include("partials/sidebar") %>
+
+<div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+    <header class="bg-white border-b border-[#DCE7E0] h-[68px] flex items-center justify-between px-6 no-print flex-shrink-0">
+        <div>
+            <h1 class="text-base font-extrabold text-[#0B3D2E]">Master Data Santri</h1>
+            <p class="text-[11px] text-[#64756D]">Total <%= santriList.length %> santri terdaftar</p>
+        </div>
+        <button onclick="document.getElementById('modalSantri').showModal()" class="btn-primary px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-2 shadow-sm">
+            <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> Tambah Santri
+        </button>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-5">
+        <%- include("partials/flash") %>
+
+        <!-- Search & Filter -->
+        <form method="GET" class="card p-4 mb-5 flex flex-wrap gap-3 items-end">
+            <div class="flex-1 min-w-[200px]">
+                <label class="text-[11px] font-semibold text-[#64756D] block mb-1">Cari Santri</label>
+                <div class="relative">
+                    <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#64756D]"></i>
+                    <input type="text" name="search" value="<%= search %>" placeholder="Nama atau NIS..." class="w-full pl-9 pr-3 py-2 border border-[#DCE7E0] rounded-xl text-sm focus:outline-none focus:border-[#16845B]">
+                </div>
+            </div>
+            <div class="w-48">
+                <label class="text-[11px] font-semibold text-[#64756D] block mb-1">Kompleks Asrama</label>
+                <select name="kompleks" class="w-full px-3 py-2 border border-[#DCE7E0] rounded-xl text-sm focus:outline-none focus:border-[#16845B]">
+                    <option value="">Semua Kompleks</option>
+                    <% kompleksList.forEach(function(k) { %>
+                    <option value="<%= k.kompleks_asrama %>" <%= kompleks===k.kompleks_asrama?"selected":"" %>><%= k.kompleks_asrama %></option>
+                    <% }); %>
+                </select>
+            </div>
+            <button type="submit" class="btn-primary px-4 py-2 text-sm font-bold rounded-xl">Filter</button>
+        </form>
+
+        <!-- Table -->
+        <div class="card overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-xs">
+                    <thead>
+                        <tr class="bg-[#F5F8F6] text-[#0B3D2E] font-bold border-y border-[#DCE7E0]">
+                            <th class="py-3 px-4 text-left">NIS</th>
+                            <th class="py-3 px-4 text-left">Nama Lengkap</th>
+                            <th class="py-3 px-4 text-left">Asrama / Kamar</th>
+                            <th class="py-3 px-4 text-left">Wali</th>
+                            <th class="py-3 px-4 text-left">Alergi</th>
+                            <th class="py-3 px-4 text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#DCE7E0]">
+                    <% if (santriList.length > 0) { %>
+                    <% santriList.forEach(function(s) { %>
+                    <tr class="hover:bg-slate-50/60 transition">
+                        <td class="py-3 px-4 font-mono font-bold text-[#0B3D2E]"><%= s.nis %></td>
+                        <td class="py-3 px-4">
+                            <p class="font-semibold text-[#182923]"><%= s.nama_lengkap %></p>
+                            <p class="text-[10px] text-[#64756D]"><%= s.jenis_kelamin==="L"?"Laki-laki":"Perempuan" %></p>
+                        </td>
+                        <td class="py-3 px-4">
+                            <p class="font-medium"><%= s.kompleks_asrama||"-" %></p>
+                            <p class="text-[10px] text-[#64756D]"><%= s.kamar_asrama||"-" %></p>
+                        </td>
+                        <td class="py-3 px-4">
+                            <p class="font-medium"><%= s.nama_wali||"-" %></p>
+                            <p class="text-[10px] text-[#64756D]"><%= s.no_hp_wali||"-" %></p>
+                        </td>
+                        <td class="py-3 px-4 max-w-[150px]">
+                            <% if (s.riwayat_alergi) { %>
+                            <span class="inline-block px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-[10px] font-medium"><%= s.riwayat_alergi %></span>
+                            <% } else { %><span class="text-[#64756D]">-</span><% } %>
+                        </td>
+                        <td class="py-3 px-4 text-right">
+                            <button onclick='editSantri(<%- JSON.stringify(s) %>)' class="px-2.5 py-1.5 bg-[#16845B]/10 text-[#16845B] rounded-lg font-bold text-[10px] hover:bg-[#16845B]/20 transition">Edit</button>
+                            <form method="POST" action="/santri/hapus/<%= s.id %>" class="inline" onsubmit="return confirm('Hapus data santri ini?')">
+                                <button type="submit" class="px-2.5 py-1.5 bg-red-100 text-red-700 rounded-lg font-bold text-[10px] hover:bg-red-200 transition ml-1">Hapus</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <% }); %>
+                    <% } else { %>
+                    <tr><td colspan="6" class="py-10 text-center text-[#64756D] text-xs">Tidak ada data santri ditemukan.</td></tr>
+                    <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Modal Santri -->
+<dialog id="modalSantri" class="rounded-2xl shadow-2xl w-full max-w-xl p-0 backdrop:bg-black/40">
+    <div class="bg-[#0B3D2E] px-6 py-4 rounded-t-2xl flex items-center justify-between">
+        <h2 id="modalTitle" class="text-white font-bold text-sm">Tambah Data Santri</h2>
+        <button onclick="document.getElementById('modalSantri').close()" class="text-white/60 hover:text-white">✕</button>
+    </div>
+    <form method="POST" action="/santri/simpan" class="p-6 grid grid-cols-2 gap-4">
+        <input type="hidden" name="id" id="santriId">
+        <div class="col-span-2 grid grid-cols-2 gap-4">
+            <div>
+                <label class="text-xs font-semibold text-[#64756D] block mb-1">NIS *</label>
+                <input type="text" name="nis" id="fNis" required class="w-full px-3 py-2 border border-[#DCE7E0] rounded-xl text-sm focus:outline-none focus:border-[#16845B]">
+            </div>
+            <div>
+                <label class="text-xs font-semibold text-[#64756D] block mb-1">Nama Lengkap *</label>
+                <input type="text" name="nama_lengkap" id="fNama" required class="w-full px-3 py-2 border border-[#DCE7E0] rounded-xl text-sm focus:outline-none focus:border-[#16845B]">
+            </div>
+        </div>
+        <div>
+            <label class="text-xs font-semibold text-[#64756D] block mb-1">Jenis Kelamin</label>
+            <select name="jenis_kelamin" id="fJk" class="w-full px-3 py-2 border border-[#DCE7E0] rounded-xl text-sm focus:outline-none focus:border-[#16845B]">
+                <option value="L">Laki-laki</option>
+                <option value="P">Perempuan</option>
+            </select>
+        </div>
+        <div>
+            <label class="text-xs font-semibold text-[#64756D] block mb-1">Tanggal Lahir</label>
+            <input type="date" name="tanggal_lahir" id="fTgl" class="w-full px-3 py-2 border border-[#DCE7E0] rounded-xl text-sm focus:outline-none focus:border-[#16845B]">
+        </div>
+        <div>
+            <label class="text-xs font-semibold text-[#64756D] block mb-1">Kompleks Asrama</label>
+            <input type="text" name="kompleks_asrama" id="fKompleks" class="w-full px-3 py-2 border border-[#DCE7E0] rounded-xl text-sm focus:outline-none focus:border-[#16845B]">
+        </div>
+        <div>
+            <label class="text-xs font-semibold text-[#64756D] block mb-1">Kamar</label>
+            <input type="text" name="kamar_asrama" id="fKamar" class="w-full px-3 py-2 border border-[#DCE7E0] rounded-xl text-sm focus:outline-none focus:border-[#16845B]">
+        </div>
+        <div>
+            <label class="text-xs font-semibold text-[#64756D] block mb-1">Nama Wali</label>
+            <input type="text" name="nama_wali" id="fWali" class="w-full px-3 py-2 border border-[#DCE7E0] rounded-xl text-sm focus:outline-none focus:border-[#16845B]">
+        </div>
+        <div>
+            <label class="text-xs font-semibold text-[#64756D] block mb-1">No. HP Wali</label>
+            <input type="text" name="no_hp_wali" id="fHp" class="w-full px-3 py-2 border border-[#DCE7E0] rounded-xl text-sm focus:outline-none focus:border-[#16845B]">
+        </div>
+        <div class="col-span-2">
+            <label class="text-xs font-semibold text-[#64756D] block mb-1">Riwayat Alergi / Komorbid</label>
+            <textarea name="riwayat_alergi" id="fAlergi" rows="2" class="w-full px-3 py-2 border border-[#DCE7E0] rounded-xl text-sm focus:outline-none focus:border-[#16845B]" placeholder="Kosongkan jika tidak ada..."></textarea>
+        </div>
+        <div class="col-span-2 flex justify-end gap-3 pt-2">
+            <button type="button" onclick="document.getElementById('modalSantri').close()" class="px-4 py-2 rounded-xl border border-[#DCE7E0] text-sm text-[#64756D] hover:bg-slate-50">Batal</button>
+            <button type="submit" class="btn-primary px-5 py-2 text-sm font-bold rounded-xl">Simpan</button>
+        </div>
+    </form>
+</dialog>
+
+<script>
+function editSantri(s) {
+    document.getElementById("modalTitle").textContent = "Edit Data Santri";
+    document.getElementById("santriId").value = s.id;
+    document.getElementById("fNis").value = s.nis||"";
+    document.getElementById("fNama").value = s.nama_lengkap||"";
+    document.getElementById("fJk").value = s.jenis_kelamin||"L";
+    document.getElementById("fTgl").value = s.tanggal_lahir ? s.tanggal_lahir.slice(0,10) : "";
+    document.getElementById("fKompleks").value = s.kompleks_asrama||"";
+    document.getElementById("fKamar").value = s.kamar_asrama||"";
+    document.getElementById("fWali").value = s.nama_wali||"";
+    document.getElementById("fHp").value = s.no_hp_wali||"";
+    document.getElementById("fAlergi").value = s.riwayat_alergi||"";
+    document.getElementById("modalSantri").showModal();
+}
+</script>
+
+<%- include("partials/footer") %>

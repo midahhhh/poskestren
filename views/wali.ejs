@@ -1,0 +1,173 @@
+﻿<%- include("partials/head") %>
+
+<!-- Portal Wali — Dedicated full-width layout (no sidebar) -->
+<style>
+    .wali-header { background: linear-gradient(135deg, #0B3D2E 0%, #16845B 60%, #1aac75 100%); }
+    .pill { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border-radius:999px; font-size:11px; font-weight:700; }
+</style>
+
+<!-- Slim Header -->
+<div class="wali-header w-full text-white no-print">
+    <div class="max-w-5xl mx-auto px-4">
+        <!-- Top bar -->
+        <div class="py-1.5 border-b border-white/10 flex items-center justify-between text-[10px] text-emerald-200">
+            <span>🏥 Poskestren Al-Bahjah Cabang Bogor</span>
+            <span id="waliClock"></span>
+        </div>
+        <!-- Main header -->
+        <div class="py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center">
+                    <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
+                </div>
+                <div>
+                    <p class="text-[11px] font-bold text-white/60 tracking-wider uppercase">Portal Keluarga & Wali Santri</p>
+                    <p class="font-extrabold text-white text-[15px] leading-tight"><%= namaWali %></p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <% if (antreanSakit.length > 0) { %>
+                <span class="pill bg-red-500/20 border border-red-400/30 text-red-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-ping"></span>
+                    <%= antreanSakit.length %> Ananda Sakit
+                </span>
+                <% } %>
+                <a href="/logout" class="pill bg-white/10 border border-white/20 text-white/80 hover:bg-white/20 transition">
+                    <i data-lucide="log-out" class="w-3 h-3"></i> Keluar
+                </a>
+            </div>
+        </div>
+        <!-- Nav pills -->
+        <div class="pb-0 flex gap-2 overflow-x-auto">
+            <a href="/wali" id="tabSakit" class="pill bg-white/20 border border-white/30 text-white">
+                <i data-lucide="activity" class="w-3 h-3"></i>
+                Kondisi Saat Ini
+                <% if (antreanSakit.length > 0) { %>
+                <span class="bg-red-500 text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center font-extrabold"><%= antreanSakit.length %></span>
+                <% } %>
+            </a>
+            <a href="#riwayat" class="pill bg-white/10 border border-white/10 text-white/70 hover:bg-white/20 transition">
+                <i data-lucide="clock" class="w-3 h-3"></i>
+                Riwayat Kunjungan
+                <span class="bg-white/20 text-white text-[9px] rounded-full px-1.5"><%= riwayatKunjungan.length %></span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="max-w-5xl mx-auto px-4 py-6 space-y-6">
+    <%- include("partials/flash") %>
+
+    <!-- Santri yang Sedang Sakit -->
+    <% if (antreanSakit.length > 0) { %>
+    <div>
+        <div class="flex items-center gap-2 mb-4">
+            <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
+            <h2 class="text-base font-extrabold text-[#0B3D2E]">Ananda Sedang Sakit — Perlu Perhatian</h2>
+        </div>
+        <div class="space-y-4">
+        <% antreanSakit.forEach(function(ant) { %>
+        <% const skor = parseFloat(ant.skor_saw_akhir)||0; %>
+        <% const isDarurat = ant.tingkat_prioritas==="P1_Gawat_Darurat"||skor>=0.80; %>
+        <div class="card p-5 <%= isDarurat?'border-red-300 bg-red-50/20':'border-[#DCE7E0]' %>">
+            <div class="flex items-start justify-between flex-wrap gap-3">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <% if (isDarurat) { %>
+                        <span class="badge-p1 px-2.5 py-1 rounded-full text-[11px] font-bold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 bg-red-600 rounded-full animate-ping"></span>P1 — GAWAT DARURAT</span>
+                        <% } else if (skor>=0.50) { %>
+                        <span class="badge-p2 px-2.5 py-1 rounded-full text-[11px] font-bold">P2 — MENDESAK</span>
+                        <% } else { %>
+                        <span class="badge-p3 px-2.5 py-1 rounded-full text-[11px] font-bold">P3 — TERPANTAU STABIL</span>
+                        <% } %>
+                        <span class="text-[11px] text-[#64756D] font-mono">#<%= ant.no_antrean %></span>
+                    </div>
+                    <h3 class="text-lg font-extrabold text-[#0B3D2E]"><%= ant.nama_lengkap %></h3>
+                    <p class="text-xs text-[#64756D]">NIS: <%= ant.nis %> &bull; <%= ant.kompleks_asrama||"-" %> — Kamar <%= ant.kamar_asrama||"-" %></p>
+                </div>
+                <div class="text-right">
+                    <p class="text-[10px] text-[#64756D]">Skor SAW</p>
+                    <p class="text-3xl font-extrabold <%= isDarurat?'text-red-600':skor>=0.50?'text-amber-600':'text-[#16845B]' %>"><%= skor.toFixed(3) %></p>
+                </div>
+            </div>
+
+            <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                <div class="bg-[#F5F8F6] p-2.5 rounded-xl">
+                    <p class="text-[#64756D]">Keluhan</p>
+                    <p class="font-semibold text-[#182923] mt-0.5 line-clamp-2"><%= ant.keluhan_utama||"-" %></p>
+                </div>
+                <div class="bg-[#F5F8F6] p-2.5 rounded-xl">
+                    <p class="text-[#64756D]">Suhu Tubuh</p>
+                    <p class="font-bold text-[#182923] mt-0.5"><%= ant.suhu_tubuh||"—" %> °C</p>
+                </div>
+                <div class="bg-[#F5F8F6] p-2.5 rounded-xl">
+                    <p class="text-[#64756D]">Tekanan Darah</p>
+                    <p class="font-bold text-[#182923] mt-0.5"><%= ant.tekanan_darah||"—" %></p>
+                </div>
+                <div class="bg-[#F5F8F6] p-2.5 rounded-xl">
+                    <p class="text-[#64756D]">Status Penanganan</p>
+                    <p class="font-bold text-[#182923] mt-0.5 capitalize"><%= (ant.status_antrean||"-").replace(/_/g," ") %></p>
+                </div>
+            </div>
+
+            <!-- Tombol WA -->
+            <% 
+            const waUrl = helpers.buildWaUrl(ant.nama_lengkap, ant.nis, ant.kamar_asrama||"-", ant.keluhan_utama, ant.tingkat_prioritas, ant.skor_saw_akhir, ant.status_antrean);
+            %>
+            <div class="mt-4 flex items-center gap-3">
+                <a href="<%= waUrl %>" target="_blank"
+                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#25D366] text-white font-bold text-xs shadow-sm hover:bg-[#1da851] transition">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    Hubungi Petugas via WhatsApp
+                </a>
+                <% if (isDarurat) { %>
+                <span class="text-[11px] text-red-600 font-semibold animate-pulse">⚡ Kondisi Darurat — Segera hubungi petugas!</span>
+                <% } %>
+            </div>
+        </div>
+        <% }); %>
+        </div>
+    </div>
+    <% } else { %>
+    <div class="card p-8 text-center border-emerald-200 bg-emerald-50/30">
+        <div class="w-14 h-14 rounded-full bg-emerald-100 text-[#16845B] flex items-center justify-center mx-auto mb-3 text-2xl">✓</div>
+        <h2 class="font-extrabold text-[#0B3D2E] text-base">Alhamdulillah, Ananda dalam Kondisi Sehat</h2>
+        <p class="text-xs text-[#64756D] mt-1">Tidak ada santri yang terdaftar dalam antrean sakit saat ini.</p>
+    </div>
+    <% } %>
+
+    <!-- Riwayat Kunjungan -->
+    <div id="riwayat" class="card p-5">
+        <h2 class="text-sm font-extrabold text-[#0B3D2E] pb-3 border-b border-[#DCE7E0] mb-4">Riwayat Kunjungan Kesehatan</h2>
+        <% if (riwayatKunjungan.length > 0) { %>
+        <div class="space-y-2">
+        <% riwayatKunjungan.forEach(function(r) { %>
+        <% const tgl = helpers.tglIndo(r.tanggal_berobat, false); %>
+        <div class="p-3 rounded-xl border border-[#DCE7E0] flex items-start justify-between hover:bg-slate-50/60 transition">
+            <div>
+                <div class="flex items-center gap-2">
+                    <p class="font-semibold text-sm text-[#182923]"><%= r.nama_lengkap %></p>
+                    <span class="text-[10px] text-[#64756D]">— <%= tgl %></span>
+                </div>
+                <p class="text-xs text-[#64756D] mt-0.5"><%= r.keluhan_utama||"-" %></p>
+                <% if (r.diagnosis) { %><p class="text-[11px] font-semibold text-[#16845B] mt-0.5">Diagnosis: <%= r.diagnosis %></p><% } %>
+            </div>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-medium capitalize flex-shrink-0 ml-2"><%= (r.status_antrean||"-").replace(/_/g," ") %></span>
+        </div>
+        <% }); %>
+        </div>
+        <% } else { %>
+        <p class="text-xs text-[#64756D] text-center py-4">Belum ada riwayat kunjungan.</p>
+        <% } %>
+    </div>
+</div>
+
+<script>
+function updateClock() {
+    const now = new Date();
+    document.getElementById("waliClock").textContent = now.toLocaleDateString("id-ID",{weekday:"long",day:"2-digit",month:"long",year:"numeric"}) + " — " + now.toLocaleTimeString("id-ID");
+}
+updateClock(); setInterval(updateClock, 1000);
+</script>
+
+<%- include("partials/footer") %>

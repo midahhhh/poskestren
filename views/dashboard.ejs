@@ -1,0 +1,199 @@
+﻿<%- include("partials/head") %>
+<%- include("partials/sidebar") %>
+
+<div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+    <!-- Top Bar -->
+    <header class="bg-white border-b border-[#DCE7E0] h-[68px] flex items-center justify-between px-6 no-print flex-shrink-0">
+        <div>
+            <h1 class="text-base font-extrabold text-[#0B3D2E]">Dashboard Operasional</h1>
+            <p class="text-[11px] text-[#64756D]">Antrean triase real-time berbasis SAW — <%= new Date().toLocaleDateString("id-ID",{weekday:"long",year:"numeric",month:"long",day:"numeric"}) %></p>
+        </div>
+        <a href="/triase" class="btn-primary px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-2 shadow-sm">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Input Triase Baru
+        </a>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-5 space-y-5">
+        <%- include("partials/flash") %>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
+            <div class="card p-4">
+                <p class="text-[11px] font-semibold text-[#64756D]">Kunjungan Hari Ini</p>
+                <p class="text-2xl font-extrabold text-[#0B3D2E] mt-1"><%= stats.total %></p>
+                <p class="text-[10px] text-[#64756D]">santri</p>
+            </div>
+            <div class="card p-4 border-red-200 bg-red-50/30">
+                <p class="text-[11px] font-bold text-red-700 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500 animate-ping inline-block"></span>P1 - Darurat</p>
+                <p class="text-2xl font-extrabold text-red-600 mt-1"><%= stats.p1 %></p>
+                <p class="text-[10px] text-red-500">prioritas utama</p>
+            </div>
+            <div class="card p-4 border-amber-200 bg-amber-50/30">
+                <p class="text-[11px] font-bold text-amber-800">P2 - Mendesak</p>
+                <p class="text-2xl font-extrabold text-amber-700 mt-1"><%= stats.p2 %></p>
+                <p class="text-[10px] text-amber-600">butuh perhatian</p>
+            </div>
+            <div class="card p-4">
+                <p class="text-[11px] font-semibold text-[#64756D]">P3 - Biasa</p>
+                <p class="text-2xl font-extrabold text-[#16845B] mt-1"><%= stats.p3 %></p>
+                <p class="text-[10px] text-[#64756D]">stabil</p>
+            </div>
+            <div class="card p-4">
+                <p class="text-[11px] font-semibold text-[#64756D]">Rawat Inap</p>
+                <p class="text-2xl font-extrabold text-[#0B3D2E] mt-1"><%= stats.rawatInap %></p>
+                <p class="text-[10px] text-[#64756D]">dari 6 bed</p>
+            </div>
+            <div class="card p-4 <%= stats.stokKritis > 0 ? 'border-red-200 bg-red-50/30' : '' %>">
+                <p class="text-[11px] font-<%= stats.stokKritis > 0 ? 'bold text-red-700' : 'semibold text-[#64756D]' %>">Obat Kritis</p>
+                <p class="text-2xl font-extrabold <%= stats.stokKritis > 0 ? 'text-red-600' : 'text-[#0B3D2E]' %> mt-1"><%= stats.stokKritis %></p>
+                <p class="text-[10px] text-[#64756D]">item</p>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            <!-- Antrean Table -->
+            <div class="lg:col-span-8 card p-5">
+                <div class="flex items-center justify-between pb-4 border-b border-[#DCE7E0] mb-4">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-[#16845B] animate-pulse"></span>
+                            <h2 class="text-sm font-extrabold text-[#0B3D2E]">Antrean Triase Aktif (SAW)</h2>
+                        </div>
+                        <p class="text-[11px] text-[#64756D] mt-0.5">Urutan dihitung otomatis dari 5 kriteria klinis C1–C5</p>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-[#F5F8F6] text-[#0B3D2E] font-bold border-y border-[#DCE7E0]">
+                                <th class="py-2.5 px-3">Rank</th>
+                                <th class="py-2.5 px-3">Santri</th>
+                                <th class="py-2.5 px-3">Keluhan</th>
+                                <th class="py-2.5 px-3 text-center">Prioritas</th>
+                                <th class="py-2.5 px-3 text-center">Skor SAW</th>
+                                <th class="py-2.5 px-3 text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-[#DCE7E0]">
+                        <% if (antrean.length > 0) { %>
+                        <% antrean.forEach(function(ant, idx) { %>
+                        <% const skor = parseFloat(ant.skor_saw_akhir)||0; %>
+                        <% const isDarurat = ant.tingkat_prioritas==="P1_Gawat_Darurat" || skor>=0.80; %>
+                        <tr class="hover:bg-slate-50/60 transition <%= isDarurat ? 'bg-red-50/20' : '' %>">
+                            <td class="py-3 px-3">
+                                <span class="w-6 h-6 rounded-full inline-flex items-center justify-center font-bold text-[10px] <%= idx===0 ? 'bg-red-500 text-white' : 'bg-slate-100 text-[#0B3D2E]' %>">
+                                    #<%= idx+1 %>
+                                </span>
+                                <span class="block text-[10px] text-[#64756D] font-mono mt-0.5"><%= ant.no_antrean %></span>
+                            </td>
+                            <td class="py-3 px-3">
+                                <span class="font-bold text-[#182923] block"><%= ant.nama_lengkap %></span>
+                                <span class="text-[10px] text-[#64756D]">NIS: <%= ant.nis %> &bull; <%= ant.kamar_asrama||"-" %></span>
+                            </td>
+                            <td class="py-3 px-3 max-w-[180px]">
+                                <p class="text-xs text-[#182923] line-clamp-2"><%= ant.keluhan_utama||"-" %></p>
+                            </td>
+                            <td class="py-3 px-3 text-center">
+                                <% if (isDarurat) { %>
+                                <span class="badge-p1 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold"><span class="w-1.5 h-1.5 rounded-full bg-red-600 animate-ping"></span>P1 DARURAT</span>
+                                <% } else if (ant.tingkat_prioritas==="P2_Mendesak" || skor>=0.50) { %>
+                                <span class="badge-p2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>P2 MENDESAK</span>
+                                <% } else { %>
+                                <span class="badge-p3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>P3 BIASA</span>
+                                <% } %>
+                            </td>
+                            <td class="py-3 px-3 text-center">
+                                <span class="text-sm font-black <%= skor>=0.80 ? 'text-red-600' : (skor>=0.50 ? 'text-amber-600' : 'text-[#16845B]') %>">
+                                    <%= skor.toFixed(3) %>
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-right">
+                                <a href="/rekam-medis?kunjungan_id=<%= ant.id %>" class="btn-primary px-2.5 py-1.5 text-[11px] font-bold rounded-lg inline-block">Periksa</a>
+                            </td>
+                        </tr>
+                        <% }); %>
+                        <% } else { %>
+                        <tr><td colspan="6" class="py-10 text-center">
+                            <div class="w-10 h-10 rounded-full bg-emerald-50 text-[#16845B] flex items-center justify-center mx-auto mb-2 text-xl">✓</div>
+                            <p class="font-semibold text-xs text-[#0B3D2E]">Tidak ada antrean santri sakit saat ini.</p>
+                            <p class="text-[11px] text-[#64756D]">Seluruh santri telah mendapatkan penanganan.</p>
+                        </td></tr>
+                        <% } %>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-3 pt-3 border-t border-[#DCE7E0] flex items-center justify-between text-[10px] text-[#64756D]">
+                    <span>P1 (≥0.80) &bull; P2 (0.50–0.79) &bull; P3 (&lt;0.50)</span>
+                    <a href="/triase" class="text-[#16845B] font-bold hover:underline">Buka Kalkulasi SAW →</a>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="lg:col-span-4 space-y-4">
+                <!-- Chart -->
+                <div class="card p-5">
+                    <div class="flex items-center justify-between pb-3 border-b border-[#DCE7E0] mb-4">
+                        <h2 class="text-sm font-extrabold text-[#0B3D2E]">Distribusi Triase SAW</h2>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">Hari Ini</span>
+                    </div>
+                    <div class="relative h-44 flex items-center justify-center">
+                        <canvas id="triaseChart"></canvas>
+                    </div>
+                    <div class="mt-3 pt-3 border-t border-[#DCE7E0] grid grid-cols-3 text-center text-[11px]">
+                        <div><p class="text-[10px] text-[#64756D]">P1 Darurat</p><p class="font-extrabold text-red-600"><%= stats.p1 %></p></div>
+                        <div><p class="text-[10px] text-[#64756D]">P2 Mendesak</p><p class="font-extrabold text-amber-600"><%= stats.p2 %></p></div>
+                        <div><p class="text-[10px] text-[#64756D]">P3 Biasa</p><p class="font-extrabold text-[#16845B]"><%= stats.p3 %></p></div>
+                    </div>
+                </div>
+
+                <!-- Obat Alert -->
+                <div class="card p-5">
+                    <div class="flex items-center justify-between pb-3 border-b border-[#DCE7E0] mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="p-1 rounded bg-amber-100 text-amber-700 text-xs">⚠️</span>
+                            <h2 class="text-sm font-extrabold text-[#0B3D2E]">Peringatan Stok Obat</h2>
+                        </div>
+                        <a href="/farmasi" class="text-[11px] text-[#16845B] font-bold hover:underline">Kelola →</a>
+                    </div>
+                    <div class="space-y-2">
+                    <% if (obatAlert && obatAlert.length > 0) { %>
+                    <% obatAlert.forEach(function(ob) { %>
+                    <% const kritis = ob.stok_sekarang <= ob.stok_minimal; %>
+                    <div class="p-2.5 rounded-xl border flex items-center justify-between <%= kritis ? 'border-red-200 bg-red-50/40' : 'border-amber-200 bg-amber-50/40' %>">
+                        <div>
+                            <p class="font-bold text-xs text-[#182923]"><%= ob.nama_obat %></p>
+                            <p class="text-[10px] text-[#64756D]">Exp: <%= ob.exp_date ? new Date(ob.exp_date).toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"}) : "-" %></p>
+                        </div>
+                        <div class="text-right">
+                            <span class="inline-block px-2 py-0.5 rounded text-[10px] font-extrabold <%= kritis ? 'bg-red-100 text-red-800 border border-red-300' : 'bg-amber-100 text-amber-800 border border-amber-300' %>">
+                                <%= ob.stok_sekarang %> <%= ob.satuan %>
+                            </span>
+                            <p class="text-[9px] text-[#64756D] mt-0.5">Min: <%= ob.stok_minimal %></p>
+                        </div>
+                    </div>
+                    <% }); %>
+                    <% } else { %>
+                    <p class="text-xs text-center text-[#64756D] py-3">Semua stok obat dalam kondisi aman ✓</p>
+                    <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById("triaseChart").getContext("2d");
+    new Chart(ctx, {
+        type: "doughnut",
+        data: {
+            labels: ["P1 Darurat", "P2 Mendesak", "P3 Biasa"],
+            datasets: [{ data: [<%= stats.p1 %>, <%= stats.p2 %>, <%= stats.p3 %>], backgroundColor: ["#D64545","#F4C542","#16845B"], borderWidth: 2, borderColor:"#fff", hoverOffset: 4 }]
+        },
+        options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:"bottom", labels:{ boxWidth:10, font:{size:10,family:"Inter"}, color:"#182923" } } }, cutout:"72%" }
+    });
+</script>
+
+<%- include("partials/footer") %>

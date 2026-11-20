@@ -1,0 +1,12 @@
+﻿<% if (locals.flashError) { %>
+<div class="flash-error mb-5 flex items-start gap-2" role="alert">
+    <i data-lucide="alert-circle" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
+    <span class="text-sm"><%- flashError %></span>
+</div>
+<% } %>
+<% if (locals.flashSuccess) { %>
+<div class="flash-success mb-5 flex items-start gap-2" role="alert">
+    <i data-lucide="check-circle" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
+    <span class="text-sm"><%- flashSuccess %></span>
+</div>
+<% } %>

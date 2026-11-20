@@ -1,0 +1,101 @@
+﻿<%- include("partials/head") %>
+<%- include("partials/sidebar") %>
+
+<div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+    <header class="bg-white border-b border-[#DCE7E0] h-[68px] flex items-center px-6 no-print flex-shrink-0">
+        <div>
+            <h1 class="text-base font-extrabold text-[#0B3D2E]">Konfigurasi Kriteria & Bobot SAW</h1>
+            <p class="text-[11px] text-[#64756D]">5 kriteria medis — total bobot harus tepat 100%</p>
+        </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-5 space-y-5">
+        <%- include("partials/flash") %>
+
+        <div class="card p-5">
+            <h2 class="text-sm font-extrabold text-[#0B3D2E] mb-4">Bobot Kriteria SAW (C1–C5)</h2>
+            <form method="POST" action="/kriteria/update-bobot">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs">
+                        <thead>
+                            <tr class="bg-[#F5F8F6] text-[#0B3D2E] font-bold border-y border-[#DCE7E0]">
+                                <th class="py-3 px-4 text-left">Kode</th>
+                                <th class="py-3 px-4 text-left">Nama Kriteria</th>
+                                <th class="py-3 px-4 text-left">Deskripsi</th>
+                                <th class="py-3 px-4 text-center">Bobot (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-[#DCE7E0]">
+                        <% kriteria.forEach(function(k) { %>
+                        <tr class="hover:bg-slate-50/60">
+                            <td class="py-3 px-4 font-mono font-bold text-[#16845B]">C<%= k.id %></td>
+                            <td class="py-3 px-4 font-semibold text-[#182923]"><%= k.nama_kriteria %></td>
+                            <td class="py-3 px-4 text-[#64756D] max-w-[300px]"><%= k.deskripsi||"-" %></td>
+                            <td class="py-3 px-4 text-center">
+                                <input type="number" name="bobot[<%= k.id %>]" value="<%= k.bobot_persen %>" min="0" max="100" step="0.01"
+                                    class="w-20 text-center px-2 py-1 border border-[#DCE7E0] rounded-lg text-sm focus:outline-none focus:border-[#16845B] font-bold">
+                            </td>
+                        </tr>
+                        <% }); %>
+                        </tbody>
+                        <tfoot>
+                            <tr class="bg-[#F5F8F6] border-t-2 border-[#DCE7E0]">
+                                <td colspan="3" class="py-3 px-4 font-bold text-[#0B3D2E] text-right text-sm">Total Bobot:</td>
+                                <td class="py-3 px-4 text-center font-extrabold text-[#16845B] text-base" id="totalBobot">—</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="mt-4 flex justify-end">
+                    <button type="submit" class="btn-primary px-5 py-2 text-sm font-bold rounded-xl">Simpan Bobot</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sub Kriteria -->
+        <div class="card p-5">
+            <h2 class="text-sm font-extrabold text-[#0B3D2E] mb-4">Tabel Sub Kriteria & Konversi Nilai Crisp</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-xs">
+                    <thead>
+                        <tr class="bg-[#F5F8F6] text-[#0B3D2E] font-bold border-y border-[#DCE7E0]">
+                            <th class="py-3 px-4 text-left">Kriteria</th>
+                            <th class="py-3 px-4 text-left">Label / Deskripsi</th>
+                            <th class="py-3 px-4 text-center">Nilai Crisp (1–5)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#DCE7E0]">
+                    <% subKriteria.forEach(function(sk) { %>
+                    <% const kr = kriteria.find(k=>k.id===sk.kriteria_id); %>
+                    <tr class="hover:bg-slate-50/60">
+                        <td class="py-2.5 px-4 font-mono font-bold text-[#16845B]"><%= kr ? "C"+kr.id+" — "+kr.nama_kriteria : "C"+sk.kriteria_id %></td>
+                        <td class="py-2.5 px-4 text-[#182923]"><%= sk.label||sk.deskripsi||"-" %></td>
+                        <td class="py-2.5 px-4 text-center">
+                            <span class="inline-block w-7 h-7 rounded-full text-xs font-extrabold flex items-center justify-center
+                                <%= sk.nilai_crisp>=5?'bg-red-100 text-red-800':sk.nilai_crisp>=4?'bg-orange-100 text-orange-800':sk.nilai_crisp>=3?'bg-amber-100 text-amber-800':sk.nilai_crisp>=2?'bg-lime-100 text-lime-800':'bg-emerald-100 text-emerald-800' %>">
+                                <%= sk.nilai_crisp %>
+                            </span>
+                        </td>
+                    </tr>
+                    <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+function hitungTotal() {
+    const inputs = document.querySelectorAll("input[name^='bobot']");
+    let total = 0;
+    inputs.forEach(i => total += parseFloat(i.value)||0);
+    const el = document.getElementById("totalBobot");
+    el.textContent = total.toFixed(1) + "%";
+    el.className = Math.abs(total-100)<0.01 ? "py-3 px-4 text-center font-extrabold text-[#16845B] text-base" : "py-3 px-4 text-center font-extrabold text-red-600 text-base";
+}
+document.querySelectorAll("input[name^='bobot']").forEach(i => i.addEventListener("input", hitungTotal));
+hitungTotal();
+</script>
+
+<%- include("partials/footer") %>

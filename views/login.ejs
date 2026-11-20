@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind Play CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F5F8F6; }
+        .bg-deep-green { background-color: #0B3D2E; }
+        .text-deep-green { color: #0B3D2E; }
+        .bg-primary-green { background-color: #16845B; }
+        .text-primary-green { color: #16845B; }
+        .border-border-color { border-color: #DCE7E0; }
+        .text-text-muted { color: #64756D; }
+        .text-warm-yellow { color: #F4C542; }
+        .bg-warm-yellow { background-color: #F4C542; }
+    </style>
+</head>
+<body class="min-h-full flex items-center justify-center p-4 sm:p-6 lg:p-8">
+
+    <div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl border border-border-color overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+        
+        <!-- KOLOM KIRI: Profil Portal Wali & Bantuan Kredensial -->
+        <div class="lg:col-span-5 bg-gradient-to-br from-[#0B3D2E] via-[#0e4837] to-[#07251c] text-white p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden">
+            <div class="absolute -top-12 -left-12 w-48 h-48 bg-amber-400/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div>
+                <div class="flex items-center justify-between mb-6 text-xs">
+                    <a href="/" class="inline-flex items-center gap-1.5 text-emerald-300 font-semibold hover:text-white transition">
+                        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                        <span>Beranda Publik</span>
+                    </a>
+                    <a href="/wali" class="inline-flex items-center gap-1.5 text-warm-yellow font-semibold hover:text-white transition">
+                        <span>Portal Wali Santri</span>
+                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                    </a>
+                </div>
+
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-[#16845B] flex items-center justify-center text-white font-extrabold text-xl shadow-lg border border-emerald-400/30">
+                        AB
+                    </div>
+                    <div>
+                        <span class="inline-block px-2 py-0.5 rounded-full bg-amber-500/20 text-warm-yellow border border-amber-400/30 font-mono text-[9px] uppercase tracking-wider font-bold">
+                            KHUSUS WALI SANTRI
+                        </span>
+                        <h1 class="text-lg sm:text-xl font-extrabold text-white leading-tight">
+                            Poskestren Al-Bahjah
+                        </h1>
+                    </div>
+                </div>
+
+                <p class="text-xs text-emerald-200/80 leading-relaxed mb-5">
+                    Pusat layanan pemantauan kesehatan santri bagi orang tua / wali santri Pondok Pesantren Al-Bahjah Cabang Bogor.
+                </p>
+
+                <!-- KREDENSIAL DEMO WALI SANTRI -->
+                <div class="bg-amber-950/40 p-4 rounded-2xl border border-amber-600/40 mb-4 shadow-inner">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1">
+                            <i data-lucide="key-round" class="w-3 h-3 text-warm-yellow"></i>
+                            Akun Uji Coba Wali Santri:
+                        </span>
+                        <span class="text-[9px] px-1.5 py-0.2 rounded bg-amber-900/80 text-amber-200 font-mono">1-Klik Isi</span>
+                    </div>
+                    <div class="space-y-1.5 text-xs">
+                        <button type="button" onclick="isiAkun('085770909120', 'admin123')" class="w-full px-3 py-2 rounded-xl bg-emerald-950/80 hover:bg-amber-700 text-white flex items-center justify-between transition text-left border border-amber-600/30 group">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="users" class="w-3.5 h-3.5 text-amber-300 group-hover:scale-110 transition-transform"></i>
+                                <span class="font-semibold text-[11px]">Wali Santri Terdaftar</span>
+                            </div>
+                            <span class="text-[10px] text-amber-300 group-hover:text-white font-mono bg-amber-950 px-1.5 py-0.5 rounded">085770909120</span>
+                        </button>
+                        <button type="button" onclick="isiAkun('2024-AB-0192', 'admin123')" class="w-full px-3 py-2 rounded-xl bg-emerald-950/80 hover:bg-amber-700 text-white flex items-center justify-between transition text-left border border-amber-600/30 group">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-amber-300 group-hover:scale-110 transition-transform"></i>
+                                <span class="font-semibold text-[11px]">Akun Santri Mandiri</span>
+                            </div>
+                            <span class="text-[10px] text-amber-300 group-hover:text-white font-mono bg-amber-950 px-1.5 py-0.5 rounded">2024-AB-0192</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PINTU MASUK PETUGAS MEDIS -->
+                <div class="p-3.5 rounded-2xl bg-emerald-950/80 border border-emerald-700/60 flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-800 text-white flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="stethoscope" class="w-4 h-4 text-emerald-300"></i>
+                        </div>
+                        <div>
+                            <span class="text-[11px] font-bold text-white block leading-tight">Anda Petugas Medis / Admin?</span>
+                            <span class="text-[10px] text-emerald-300 block">Khusus Dokter, Perawat & Apoteker</span>
+                        </div>
+                    </div>
+                    <a href="/login-petugas" class="px-2.5 py-1.5 rounded-lg bg-white text-deep-green hover:bg-emerald-100 font-bold text-[10px] whitespace-nowrap transition shadow-xs flex items-center gap-1">
+                        <span>Pintu Petugas</span>
+                        <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="text-[11px] text-emerald-300/60 pt-4 border-t border-emerald-800/50 flex items-center justify-between">
+                <span>Node.js Express + MySQL</span>
+                <span>Standar Triase SAW Medis</span>
+            </div>
+        </div>
+
+        <!-- KOLOM KANAN: Form Khusus Wali Santri (Login & Registrasi) -->
+        <div class="lg:col-span-7 p-6 sm:p-10 flex flex-col justify-center">
+
+            <!-- TABS 2 PILIHAN WALI SANTRI: MASUK vs DAFTAR BARU -->
+            <div class="grid grid-cols-2 gap-1.5 p-1.5 bg-[#F5F8F6] rounded-2xl border border-border-color mb-6">
+                <button type="button" onclick="pindahTab('wali')" id="btnTabWali" class="py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 <%= tab === 'wali' ? 'bg-[#16845B] text-white shadow-sm' : 'text-[#64756D] hover:text-[#182923]' %>">
+                    <i data-lucide="log-in" class="w-4 h-4"></i>
+                    <span>Masuk Wali Santri</span>
+                </button>
+                <button type="button" onclick="pindahTab('register')" id="btnTabRegister" class="py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 <%= tab === 'register' ? 'bg-[#F4C542] text-slate-950 shadow-sm' : 'text-[#64756D] hover:text-[#182923]' %>">
+                    <i data-lucide="user-plus" class="w-4 h-4"></i>
+                    <span>Daftar Akun Baru</span>
+                </button>
+            </div>
+
+            <!-- Notifikasi Pesan Kesalahan / Keberhasilan -->
+            <% if (error) { %>
+                <div class="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs font-medium flex items-start gap-2.5">
+                    <i data-lucide="alert-triangle" class="w-4 h-4 flex-shrink-0 text-red-600 mt-0.5"></i>
+                    <div class="leading-relaxed"><%- error %></div>
+                </div>
+            <% } %>
+
+            <% if (success) { %>
+                <div class="mb-5 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-center gap-2.5">
+                    <i data-lucide="check-circle" class="w-4 h-4 flex-shrink-0 text-primary-green"></i>
+                    <span><%- success %></span>
+                </div>
+            <% } %>
+
+            <!-- FORM 1: LOGIN KHUSUS WALI SANTRI / SANTRI -->
+            <div id="panelWali" class="<%= tab === 'wali' ? '' : 'hidden' %>">
+                <div class="mb-5">
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[11px] font-bold mb-2">
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                        <span>Pintu Masuk Wali Santri</span>
+                    </div>
+                    <h2 class="text-xl font-extrabold text-[#0B3D2E]">Masuk sebagai Wali Santri</h2>
+                    <p class="text-xs text-[#64756D]">Pantau perkembangan kondisi kesehatan ananda di Poskestren Al-Bahjah secara real-time.</p>
+                </div>
+
+                <form method="POST" action="/login" class="space-y-4">
+                    <input type="hidden" name="action" value="login_wali">
+                    
+                    <div>
+                        <label for="inputUsernameWali" class="block text-xs font-bold text-[#182923] mb-1.5">
+                            Nomor WhatsApp Wali / NIS Santri
+                        </label>
+                        <div class="relative">
+                            <input type="text" name="username" id="inputUsernameWali" required placeholder="Contoh: 085770909120 atau NIS 2024-AB-0192" 
+                                   class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-[#DCE7E0] bg-[#F5F8F6] text-xs font-medium text-[#182923] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#16845B] transition">
+                            <i data-lucide="phone" class="w-4 h-4 text-text-muted absolute left-3 top-3"></i>
+                        </div>
+                        <span class="text-[10px] text-[#64756D] mt-1 block">Gunakan Nomor HP saat pendaftaran atau NIS ananda di pesantren.</span>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label for="inputPasswordWali" class="block text-xs font-bold text-[#182923]">Kata Sandi</label>
+                            <span class="text-[11px] text-[#64756D]">Demo: <code class="bg-slate-100 px-1 py-0.5 rounded text-deep-green font-mono">admin123</code></span>
+                        </div>
+                        <div class="relative">
+                            <input type="password" name="password" id="inputPasswordWali" required placeholder="Masukkan kata sandi akun wali..." 
+                                   class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-[#DCE7E0] bg-[#F5F8F6] text-xs font-medium text-[#182923] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#16845B] transition">
+                            <i data-lucide="lock" class="w-4 h-4 text-text-muted absolute left-3 top-3"></i>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 rounded-xl bg-[#16845B] hover:bg-[#0B3D2E] text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2">
+                        <i data-lucide="arrow-right-circle" class="w-4 h-4"></i>
+                        <span>Masuk ke Portal Wali Santri</span>
+                    </button>
+
+                    <div class="pt-2 text-center text-xs text-[#64756D]">
+                        Belum punya akun wali? 
+                        <button type="button" onclick="pindahTab('register')" class="font-bold text-[#16845B] hover:underline">
+                            Daftar Akun Baru Sekarang
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- FORM 2: PENDAFTARAN WALI SANTRI BARU -->
+            <div id="panelRegister" class="<%= tab === 'register' ? '' : 'hidden' %>">
+                <div class="mb-5">
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-amber-100 text-amber-900 text-[11px] font-bold mb-2">
+                        <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+                        <span>Registrasi Akun Wali Baru</span>
+                    </div>
+                    <h2 class="text-xl font-extrabold text-[#0B3D2E]">Pendaftaran Akun Wali Santri</h2>
+                    <p class="text-xs text-[#64756D]">Hubungkan nomor WhatsApp Anda dengan Nomor Induk Santri (NIS) ananda di Al-Bahjah Bogor.</p>
+                </div>
+
+                <form method="POST" action="/login" class="space-y-3.5">
+                    <input type="hidden" name="action" value="register">
+
+                    <div>
+                        <label class="block text-xs font-semibold text-[#182923] mb-1">Nama Lengkap Wali Santri</label>
+                        <div class="relative">
+                            <input type="text" name="nama_lengkap" required placeholder="Contoh: H. Ahmad Subarjo" 
+                                   class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-[#DCE7E0] bg-[#F5F8F6] text-xs font-medium text-[#182923] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#16845B] transition">
+                            <i data-lucide="user" class="w-4 h-4 text-text-muted absolute left-3 top-3"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-[#182923] mb-1">Nomor WhatsApp Aktif (Untuk Login)</label>
+                        <div class="relative">
+                            <input type="text" name="no_hp" required placeholder="Contoh: 081234567899" 
+                                   class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-[#DCE7E0] bg-[#F5F8F6] text-xs font-medium text-[#182923] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#16845B] transition">
+                            <i data-lucide="phone" class="w-4 h-4 text-text-muted absolute left-3 top-3"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-[#182923] mb-1">Nomor Induk Santri (NIS)</label>
+                        <div class="relative">
+                            <input type="text" name="nis_santri" required placeholder="Contoh: 2024-AB-0192 atau 2024-AB-0211" 
+                                   class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-[#DCE7E0] bg-[#F5F8F6] text-xs font-medium text-[#182923] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#16845B] transition">
+                            <i data-lucide="id-card" class="w-4 h-4 text-text-muted absolute left-3 top-3"></i>
+                        </div>
+                        <span class="text-[10px] text-[#64756D]">Sistem akan memverifikasi NIS santri secara otomatis.</span>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-[#182923] mb-1">Kata Sandi Baru</label>
+                        <div class="relative">
+                            <input type="password" name="password" required placeholder="Minimal 6 karakter" 
+                                   class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-[#DCE7E0] bg-[#F5F8F6] text-xs font-medium text-[#182923] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#16845B] transition">
+                            <i data-lucide="lock" class="w-4 h-4 text-text-muted absolute left-3 top-3"></i>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 rounded-xl bg-[#0B3D2E] hover:bg-[#16845B] text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2">
+                        <i data-lucide="user-check" class="w-4 h-4"></i>
+                        <span>Daftarkan Akun Wali</span>
+                    </button>
+
+                    <div class="pt-1 text-center text-xs text-[#64756D]">
+                        Sudah pernah mendaftar? 
+                        <button type="button" onclick="pindahTab('wali')" class="font-bold text-[#16845B] hover:underline">
+                            Masuk di Form Wali Santri
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        function isiAkun(u, p) {
+            document.getElementById('inputUsernameWali').value = u;
+            document.getElementById('inputPasswordWali').value = p;
+            pindahTab('wali');
+        }
+
+        function pindahTab(t) {
+            const panelWali = document.getElementById('panelWali');
+            const panelReg = document.getElementById('panelRegister');
+
+            const btnWali = document.getElementById('btnTabWali');
+            const btnReg = document.getElementById('btnTabRegister');
+
+            if (t === 'wali') {
+                panelWali.classList.remove('hidden');
+                panelReg.classList.add('hidden');
+                btnWali.className = "py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-[#16845B] text-white shadow-sm";
+                btnReg.className = "py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 text-[#64756D] hover:text-[#182923]";
+            } else if (t === 'register') {
+                panelWali.classList.add('hidden');
+                panelReg.classList.remove('hidden');
+                btnWali.className = "py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 text-[#64756D] hover:text-[#182923]";
+                btnReg.className = "py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-[#F4C542] text-slate-950 shadow-sm";
+            }
+
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+    </script>
+</body>
+</html>

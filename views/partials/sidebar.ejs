@@ -1,0 +1,56 @@
+﻿<%
+const roleBadge = {
+  admin: { label:"Administrator", cls:"bg-purple-500/20 text-purple-200 border-purple-400/30", icon:"shield" },
+  petugas_kesehatan: { label:"Tenaga Kesehatan", cls:"bg-emerald-500/20 text-emerald-200 border-emerald-400/30", icon:"stethoscope" },
+  petugas_farmasi: { label:"Apoteker / Farmasi", cls:"bg-blue-500/20 text-blue-200 border-blue-400/30", icon:"pill" },
+};
+const cur = roleBadge[userRole] || { label:"Petugas", cls:"bg-slate-500/20 text-slate-200 border-slate-400/30", icon:"user" };
+const navItems = [
+  { href:"/dashboard", icon:"layout-dashboard", label:"Dashboard", key:"dashboard", roles:["admin","petugas_kesehatan"] },
+  { href:"/triase", icon:"activity", label:"Triase & SAW", key:"triase", roles:["admin","petugas_kesehatan"] },
+  { href:"/rekam-medis", icon:"file-text", label:"Rekam Medis", key:"rekam_medis", roles:["admin","petugas_kesehatan"] },
+  { href:"/farmasi", icon:"pill", label:"Farmasi & Stok", key:"farmasi", roles:["admin","petugas_kesehatan","petugas_farmasi"] },
+  { href:"/santri", icon:"users", label:"Data Santri", key:"santri", roles:["admin","petugas_kesehatan"] },
+  { href:"/nakes", icon:"user-check", label:"Data Nakes", key:"nakes", roles:["admin"] },
+  { href:"/kriteria", icon:"sliders-horizontal", label:"Kriteria SAW", key:"kriteria", roles:["admin","petugas_kesehatan"] },
+  { href:"/laporan", icon:"bar-chart-2", label:"Laporan", key:"laporan", roles:["admin","petugas_kesehatan"] },
+];
+%>
+<aside class="sidebar w-full md:w-60 text-white flex-shrink-0 flex flex-col z-30 shadow-xl md:min-h-screen no-print">
+    <!-- Brand -->
+    <div class="h-[68px] px-5 flex items-center gap-3 border-b border-white/10">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#16845B] to-[#F4C542] flex items-center justify-center font-black text-white text-sm shadow-md flex-shrink-0">AB</div>
+        <div class="overflow-hidden">
+            <p class="font-bold text-[13px] leading-tight text-white">Poskestren Al-Bahjah</p>
+            <p class="text-[10px] text-emerald-300">Cabang Bogor — SPK Triase</p>
+        </div>
+    </div>
+    <!-- User -->
+    <div class="px-4 py-3 border-b border-white/10 flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
+            <i data-lucide="<%= cur.icon %>" class="w-4 h-4 text-emerald-300"></i>
+        </div>
+        <div class="overflow-hidden flex-1">
+            <p class="text-[11px] text-white/50 uppercase tracking-wider font-semibold"><%= cur.label %></p>
+            <p class="text-[12px] text-white font-semibold truncate"><%= userNama || "Petugas" %></p>
+        </div>
+    </div>
+    <!-- Nav -->
+    <nav class="flex-1 p-3 space-y-0.5 overflow-y-auto">
+        <% navItems.forEach(function(item) { %>
+        <% if (item.roles.includes(userRole)) { %>
+        <a href="<%= item.href %>" class="nav-link <%= currentPage === item.key ? 'active' : '' %>">
+            <i data-lucide="<%= item.icon %>" class="w-4 h-4 flex-shrink-0"></i>
+            <span><%= item.label %></span>
+        </a>
+        <% } %>
+        <% }); %>
+    </nav>
+    <!-- Logout -->
+    <div class="p-3 border-t border-white/10">
+        <a href="/logout" class="nav-link text-red-300 hover:text-white hover:bg-red-600/30">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            <span>Keluar</span>
+        </a>
+    </div>
+</aside>

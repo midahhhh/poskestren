@@ -1,0 +1,143 @@
+﻿<%- include("partials/head") %>
+<%- include("partials/sidebar") %>
+
+<div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+    <header class="bg-white border-b border-[#DCE7E0] h-[68px] flex items-center justify-between px-6 no-print flex-shrink-0">
+        <div>
+            <h1 class="text-base font-extrabold text-[#0B3D2E]">Laporan & Rekapitulasi Data</h1>
+            <p class="text-[11px] text-[#64756D]">Periode: <%= new Date(tglAwal).toLocaleDateString("id-ID",{day:"2-digit",month:"long",year:"numeric"}) %> — <%= new Date(tglAkhir).toLocaleDateString("id-ID",{day:"2-digit",month:"long",year:"numeric"}) %></p>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="window.print()" class="px-3 py-2 border border-[#DCE7E0] rounded-xl text-xs font-bold flex items-center gap-2 hover:bg-slate-50">
+                <i data-lucide="printer" class="w-3.5 h-3.5"></i> Cetak
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-5 space-y-5">
+        <!-- Filter -->
+        <form method="GET" class="card p-4 flex flex-wrap gap-3 items-end no-print">
+            <div>
+                <label class="text-xs font-semibold text-[#64756D] block mb-1">Tanggal Awal</label>
+                <input type="date" name="tgl_awal" value="<%= tglAwal %>" class="px-3 py-2 border border-[#DCE7E0] rounded-xl text-sm focus:outline-none focus:border-[#16845B]">
+            </div>
+            <div>
+                <label class="text-xs font-semibold text-[#64756D] block mb-1">Tanggal Akhir</label>
+                <input type="date" name="tgl_akhir" value="<%= tglAkhir %>" class="px-3 py-2 border border-[#DCE7E0] rounded-xl text-sm focus:outline-none focus:border-[#16845B]">
+            </div>
+            <button type="submit" class="btn-primary px-4 py-2 text-sm font-bold rounded-xl">Tampilkan</button>
+        </form>
+
+        <!-- Ringkasan KPI -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="card p-4 text-center">
+                <p class="text-2xl font-extrabold text-[#0B3D2E]"><%= kunjungan.length %></p>
+                <p class="text-xs text-[#64756D] mt-1">Total Kunjungan</p>
+            </div>
+            <% const p1 = kunjungan.filter(k=>k.tingkat_prioritas==="P1_Gawat_Darurat").length; %>
+            <% const p2 = kunjungan.filter(k=>k.tingkat_prioritas==="P2_Mendesak").length; %>
+            <% const p3 = kunjungan.filter(k=>k.tingkat_prioritas==="P3_Biasa"||!k.tingkat_prioritas).length; %>
+            <div class="card p-4 text-center border-red-200">
+                <p class="text-2xl font-extrabold text-red-600"><%= p1 %></p>
+                <p class="text-xs text-[#64756D] mt-1">P1 Darurat</p>
+            </div>
+            <div class="card p-4 text-center border-amber-200">
+                <p class="text-2xl font-extrabold text-amber-600"><%= p2 %></p>
+                <p class="text-xs text-[#64756D] mt-1">P2 Mendesak</p>
+            </div>
+            <div class="card p-4 text-center border-emerald-200">
+                <p class="text-2xl font-extrabold text-[#16845B]"><%= p3 %></p>
+                <p class="text-xs text-[#64756D] mt-1">P3 Biasa</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <!-- 10 Besar Diagnosa -->
+            <div class="card p-5">
+                <h2 class="text-sm font-extrabold text-[#0B3D2E] pb-3 border-b border-[#DCE7E0] mb-4">10 Besar Diagnosa Terbanyak</h2>
+                <% if (diagDist.length > 0) { %>
+                <% const maxJml = diagDist[0].jml; %>
+                <div class="space-y-2.5">
+                <% diagDist.forEach(function(d, i) { %>
+                <div>
+                    <div class="flex items-center justify-between text-xs mb-1">
+                        <span class="font-semibold text-[#182923] flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center <%= i===0?'bg-[#0B3D2E] text-white':'bg-slate-100 text-[#0B3D2E]' %>"><%= i+1 %></span>
+                            <%= d.diagnosis %>
+                        </span>
+                        <span class="font-bold text-[#0B3D2E]"><%= d.jml %> kasus</span>
+                    </div>
+                    <div class="h-1.5 bg-[#F5F8F6] rounded-full overflow-hidden">
+                        <div class="h-full bg-[#16845B] rounded-full" style="width: <%= (d.jml/maxJml*100).toFixed(0) %>%"></div>
+                    </div>
+                </div>
+                <% }); %>
+                </div>
+                <% } else { %><p class="text-xs text-[#64756D] text-center py-4">Tidak ada data diagnosa untuk periode ini.</p><% } %>
+            </div>
+
+            <!-- Rekapitulasi Obat -->
+            <div class="card p-5">
+                <h2 class="text-sm font-extrabold text-[#0B3D2E] pb-3 border-b border-[#DCE7E0] mb-4">Status Stok Obat Saat Ini</h2>
+                <div class="space-y-2">
+                <% mutasiObat.forEach(function(ob) { %>
+                <% const kritis = ob.stok_sekarang<=ob.stok_minimal; %>
+                <div class="flex items-center justify-between p-2.5 rounded-xl border <%= kritis?'border-red-200 bg-red-50/30':'border-[#DCE7E0] bg-[#F5F8F6]/60' %>">
+                    <p class="text-xs font-semibold text-[#182923]"><%= ob.nama_obat %></p>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold <%= kritis?'text-red-600':'text-[#16845B]' %>"><%= ob.stok_sekarang %> <%= ob.satuan %></span>
+                        <% if (kritis) { %><span class="text-[9px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded font-bold">KRITIS</span><% } %>
+                    </div>
+                </div>
+                <% }); %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabel Kunjungan Lengkap -->
+        <div class="card p-5">
+            <h2 class="text-sm font-extrabold text-[#0B3D2E] pb-3 border-b border-[#DCE7E0] mb-4">Riwayat Kunjungan Lengkap (<%= kunjungan.length %> catatan)</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-xs">
+                    <thead>
+                        <tr class="bg-[#F5F8F6] text-[#0B3D2E] font-bold border-y border-[#DCE7E0]">
+                            <th class="py-2.5 px-3 text-left">Tanggal</th>
+                            <th class="py-2.5 px-3 text-left">Santri</th>
+                            <th class="py-2.5 px-3 text-left">Keluhan</th>
+                            <th class="py-2.5 px-3 text-left">Diagnosis</th>
+                            <th class="py-2.5 px-3 text-center">Prioritas</th>
+                            <th class="py-2.5 px-3 text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#DCE7E0]">
+                    <% kunjungan.slice(0,50).forEach(function(k) { %>
+                    <tr class="hover:bg-slate-50/60">
+                        <td class="py-2.5 px-3 font-mono text-[10px] text-[#64756D]"><%= new Date(k.tanggal_berobat).toLocaleDateString("id-ID") %></td>
+                        <td class="py-2.5 px-3">
+                            <p class="font-semibold"><%= k.nama_lengkap %></p>
+                            <p class="text-[10px] text-[#64756D]"><%= k.kompleks_asrama||"-" %></p>
+                        </td>
+                        <td class="py-2.5 px-3 max-w-[150px]"><p class="line-clamp-2"><%= k.keluhan_utama||"-" %></p></td>
+                        <td class="py-2.5 px-3"><%= k.diagnosis||"-" %></td>
+                        <td class="py-2.5 px-3 text-center">
+                            <% const skor = parseFloat(k.skor_saw_akhir)||0; %>
+                            <% if (k.tingkat_prioritas==="P1_Gawat_Darurat") { %>
+                            <span class="badge-p1 px-1.5 py-0.5 rounded text-[9px] font-bold">P1</span>
+                            <% } else if (k.tingkat_prioritas==="P2_Mendesak") { %>
+                            <span class="badge-p2 px-1.5 py-0.5 rounded text-[9px] font-bold">P2</span>
+                            <% } else { %>
+                            <span class="badge-p3 px-1.5 py-0.5 rounded text-[9px] font-bold">P3</span>
+                            <% } %>
+                        </td>
+                        <td class="py-2.5 px-3 text-center text-[10px] text-[#64756D] capitalize"><%= (k.status_antrean||"-").replace(/_/g," ") %></td>
+                    </tr>
+                    <% }); %>
+                    </tbody>
+                </table>
+                <% if (kunjungan.length > 50) { %><p class="text-[11px] text-[#64756D] text-center mt-3">Menampilkan 50 dari <%= kunjungan.length %> catatan. Gunakan filter tanggal untuk mempersempit hasil.</p><% } %>
+            </div>
+        </div>
+    </main>
+</div>
+
+<%- include("partials/footer") %>

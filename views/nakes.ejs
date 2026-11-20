@@ -1,0 +1,117 @@
+﻿<%- include("partials/head") %>
+<%- include("partials/sidebar") %>
+
+<div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+    <header class="bg-white border-b border-[#DCE7E0] h-[68px] flex items-center justify-between px-6 no-print flex-shrink-0">
+        <div>
+            <h1 class="text-base font-extrabold text-[#0B3D2E]">Master Data Tenaga Kesehatan</h1>
+            <p class="text-[11px] text-[#64756D]">Manajemen akun dan hak akses petugas medis</p>
+        </div>
+        <button onclick="document.getElementById('modalNakes').showModal()" class="btn-primary px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-2 shadow-sm">
+            <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> Tambah Petugas
+        </button>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-5">
+        <%- include("partials/flash") %>
+        <div class="card overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-xs">
+                    <thead>
+                        <tr class="bg-[#F5F8F6] text-[#0B3D2E] font-bold border-y border-[#DCE7E0]">
+                            <th class="py-3 px-4 text-left">Nama Lengkap</th>
+                            <th class="py-3 px-4 text-left">Username</th>
+                            <th class="py-3 px-4 text-left">Role</th>
+                            <th class="py-3 px-4 text-left">No. HP</th>
+                            <th class="py-3 px-4 text-left">No. STR</th>
+                            <th class="py-3 px-4 text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#DCE7E0]">
+                    <% const roleLbl = {admin:"Administrator",petugas_kesehatan:"Tenaga Kesehatan",petugas_farmasi:"Apoteker / Farmasi"}; %>
+                    <% const roleCls = {admin:"bg-purple-100 text-purple-800",petugas_kesehatan:"bg-emerald-100 text-emerald-800",petugas_farmasi:"bg-blue-100 text-blue-800"}; %>
+                    <% nakesList.forEach(function(n) { %>
+                    <tr class="hover:bg-slate-50/60 transition">
+                        <td class="py-3 px-4 font-semibold text-[#182923]"><%= n.nama_lengkap %></td>
+                        <td class="py-3 px-4 font-mono text-[#64756D]"><%= n.username %></td>
+                        <td class="py-3 px-4">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold <%= roleCls[n.role]||'bg-slate-100 text-slate-800' %>">
+                                <%= roleLbl[n.role]||n.role %>
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-[#64756D]"><%= n.no_hp||"-" %></td>
+                        <td class="py-3 px-4 font-mono text-[10px] text-[#64756D]"><%= n.no_str||"-" %></td>
+                        <td class="py-3 px-4 text-right">
+                            <button onclick='editNakes(<%- JSON.stringify(n) %>)' class="px-2.5 py-1.5 bg-[#16845B]/10 text-[#16845B] rounded-lg font-bold text-[10px] hover:bg-[#16845B]/20">Edit</button>
+                            <form method="POST" action="/nakes/hapus/<%= n.id %>" class="inline" onsubmit="return confirm('Hapus akun ini?')">
+                                <button type="submit" class="px-2.5 py-1.5 bg-red-100 text-red-700 rounded-lg font-bold text-[10px] hover:bg-red-200 ml-1">Hapus</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<dialog id="modalNakes" class="rounded-2xl shadow-2xl w-full max-w-lg p-0 backdrop:bg-black/40">
+    <div class="bg-[#0B3D2E] px-6 py-4 rounded-t-2xl flex items-center justify-between">
+        <h2 id="nModalTitle" class="text-white font-bold text-sm">Tambah Petugas Kesehatan</h2>
+        <button onclick="document.getElementById('modalNakes').close()" class="text-white/60 hover:text-white">✕</button>
+    </div>
+    <form method="POST" action="/nakes/simpan" class="p-6 space-y-4">
+        <input type="hidden" name="id" id="nakesId">
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="text-xs font-semibold text-[#64756D] block mb-1">Nama Lengkap *</label>
+                <input type="text" name="nama_lengkap" id="nNama" required class="w-full px-3 py-2 border border-[#DCE7E0] rounded-xl text-sm focus:outline-none focus:border-[#16845B]">
+            </div>
+            <div>
+                <label class="text-xs font-semibold text-[#64756D] block mb-1">Username *</label>
+                <input type="text" name="username" id="nUser" required class="w-full px-3 py-2 border border-[#DCE7E0] rounded-xl text-sm focus:outline-none focus:border-[#16845B]">
+            </div>
+            <div>
+                <label class="text-xs font-semibold text-[#64756D] block mb-1">Role *</label>
+                <select name="role" id="nRole" class="w-full px-3 py-2 border border-[#DCE7E0] rounded-xl text-sm focus:outline-none focus:border-[#16845B]">
+                    <option value="admin">Administrator</option>
+                    <option value="petugas_kesehatan">Tenaga Kesehatan</option>
+                    <option value="petugas_farmasi">Apoteker / Farmasi</option>
+                </select>
+            </div>
+            <div>
+                <label class="text-xs font-semibold text-[#64756D] block mb-1">No. HP</label>
+                <input type="text" name="no_hp" id="nHp" class="w-full px-3 py-2 border border-[#DCE7E0] rounded-xl text-sm focus:outline-none focus:border-[#16845B]">
+            </div>
+            <div>
+                <label class="text-xs font-semibold text-[#64756D] block mb-1">No. STR / Izin</label>
+                <input type="text" name="no_str" id="nStr" class="w-full px-3 py-2 border border-[#DCE7E0] rounded-xl text-sm focus:outline-none focus:border-[#16845B]">
+            </div>
+            <div>
+                <label class="text-xs font-semibold text-[#64756D] block mb-1">Password <span id="passHint" class="text-[10px] text-[#64756D]">(isi untuk ubah)</span></label>
+                <input type="password" name="password" id="nPass" placeholder="Minimal 6 karakter" class="w-full px-3 py-2 border border-[#DCE7E0] rounded-xl text-sm focus:outline-none focus:border-[#16845B]">
+            </div>
+        </div>
+        <div class="flex justify-end gap-3 pt-2">
+            <button type="button" onclick="document.getElementById('modalNakes').close()" class="px-4 py-2 rounded-xl border border-[#DCE7E0] text-sm text-[#64756D]">Batal</button>
+            <button type="submit" class="btn-primary px-5 py-2 text-sm font-bold rounded-xl">Simpan</button>
+        </div>
+    </form>
+</dialog>
+
+<script>
+function editNakes(n) {
+    document.getElementById("nModalTitle").textContent = "Edit Akun Petugas";
+    document.getElementById("nakesId").value = n.id;
+    document.getElementById("nNama").value = n.nama_lengkap||"";
+    document.getElementById("nUser").value = n.username||"";
+    document.getElementById("nRole").value = n.role||"petugas_kesehatan";
+    document.getElementById("nHp").value = n.no_hp||"";
+    document.getElementById("nStr").value = n.no_str||"";
+    document.getElementById("passHint").textContent = "(kosongkan jika tidak diubah)";
+    document.getElementById("modalNakes").showModal();
+}
+</script>
+
+<%- include("partials/footer") %>

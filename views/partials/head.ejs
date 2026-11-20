@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> — Poskestren Al-Bahjah Bogor</title>
+    <meta name="description" content="Sistem Pendukung Keputusan Triase Layanan Kesehatan Santri Poskestren Al-Bahjah Bogor">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        :root {
+            --pg: #16845B; --dg: #0B3D2E; --wy: #F4C542; --er: #D64545;
+            --bg: #F5F8F6; --tp: #182923; --tm: #64756D; --bd: #DCE7E0;
+        }
+        * { font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg); color: var(--tp); }
+        .card { background: #fff; border: 1px solid var(--bd); border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .btn-primary { background: var(--pg); color:#fff; border-radius:10px; transition:background .15s; }
+        .btn-primary:hover { background: var(--dg); }
+        .btn-danger { background: var(--er); color:#fff; border-radius:10px; }
+        .badge-p1 { background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; }
+        .badge-p2 { background:#fef3c7; color:#92400e; border:1px solid #fcd34d; }
+        .badge-p3 { background:#d1fae5; color:#065f46; border:1px solid #6ee7b7; }
+        .nav-link { display:flex; align-items:center; gap:10px; padding:9px 16px; border-radius:10px; font-size:13px; font-weight:500; color: rgba(255,255,255,0.75); transition: all .15s; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.12); color:#fff; }
+        .nav-link.active { background: rgba(22,132,91,0.5); }
+        .sidebar { background: var(--dg); }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--bd); border-radius: 99px; }
+        .flash-error { background:#fee2e2; border:1px solid #fca5a5; color:#991b1b; border-radius:12px; padding:12px 16px; }
+        .flash-success { background:#d1fae5; border:1px solid #6ee7b7; color:#065f46; border-radius:12px; padding:12px 16px; }
+        input, select, textarea { font-family: 'Inter', sans-serif; }
+        @media print { .no-print { display:none !important; } }
+    </style>
+</head>
+<body class="h-full flex flex-col md:flex-row overflow-x-hidden antialiased">

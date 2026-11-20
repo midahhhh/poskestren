@@ -1,0 +1,173 @@
+﻿<%- include("partials/head") %>
+<%- include("partials/sidebar") %>
+
+<div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+    <header class="bg-white border-b border-[#DCE7E0] h-[68px] flex items-center justify-between px-6 no-print flex-shrink-0">
+        <div>
+            <h1 class="text-base font-extrabold text-[#0B3D2E]">Pelayanan Farmasi & Stok Obat</h1>
+            <p class="text-[11px] text-[#64756D]">Antrean resep digital & manajemen stok</p>
+        </div>
+        <button onclick="document.getElementById('modalObat').showModal()" class="btn-primary px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-2">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Tambah Obat
+        </button>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-5 space-y-5">
+        <%- include("partials/flash") %>
+
+        <!-- Peringatan Stok -->
+        <% if (obatAlert.length > 0) { %>
+        <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-3">
+            <span class="text-lg">⚠️</span>
+            <div>
+                <p class="font-bold text-sm text-amber-800">Peringatan Stok: <%= obatAlert.length %> item obat memerlukan perhatian</p>
+                <p class="text-xs text-amber-700 mt-0.5"><%= obatAlert.map(o=>o.nama_obat).join(", ") %></p>
+            </div>
+        </div>
+        <% } %>
+
+        <!-- Antrean Resep -->
+        <div class="card p-5">
+            <h2 class="text-sm font-extrabold text-[#0B3D2E] pb-3 border-b border-[#DCE7E0] mb-4">Antrean Resep Obat</h2>
+            <% const statusInfo = { menunggu:{cls:"bg-slate-100 text-slate-700",lbl:"Menunggu"}, diproses:{cls:"bg-blue-100 text-blue-800",lbl:"Diproses"}, siap_diambil:{cls:"bg-amber-100 text-amber-800",lbl:"Siap Diambil"}, selesai:{cls:"bg-emerald-100 text-emerald-800",lbl:"Selesai"} }; %>
+            <div class="overflow-x-auto">
+                <table class="w-full text-xs">
+                    <thead>
+                        <tr class="bg-[#F5F8F6] text-[#0B3D2E] font-bold border-y border-[#DCE7E0]">
+                            <th class="py-2.5 px-4 text-left">Pasien</th>
+                            <th class="py-2.5 px-4 text-left">Diagnosis</th>
+                            <th class="py-2.5 px-4 text-left">Resep</th>
+                            <th class="py-2.5 px-4 text-center">Status</th>
+                            <th class="py-2.5 px-4 text-right">Ubah Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#DCE7E0]">
+                    <% if (resep.length > 0) { %>
+                    <% resep.forEach(function(r) { %>
+                    <% const si = statusInfo[r.status_resep]||{cls:"bg-slate-100 text-slate-700",lbl:r.status_resep}; %>
+                    <tr class="hover:bg-slate-50/60">
+                        <td class="py-3 px-4">
+                            <p class="font-semibold"><%= r.nama_lengkap %></p>
+                            <p class="text-[10px] text-[#64756D]">No: <%= r.no_antrean %></p>
+                        </td>
+                        <td class="py-3 px-4 max-w-[150px]"><p class="text-[#182923] line-clamp-2"><%= r.diagnosis||"-" %></p></td>
+                        <td class="py-3 px-4 max-w-[200px]"><p class="font-mono text-[10px] text-[#64756D] line-clamp-3"><%= r.detail_resep||"-" %></p></td>
+                        <td class="py-3 px-4 text-center">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold <%= si.cls %>"><%= si.lbl %></span>
+                        </td>
+                        <td class="py-3 px-4 text-right">
+                            <form method="POST" action="/farmasi/update-status/<%= r.id %>" class="inline-flex gap-1">
+                                <select name="status" class="px-2 py-1 border border-[#DCE7E0] rounded-lg text-[10px] focus:outline-none focus:border-[#16845B]">
+                                    <option value="menunggu" <%= r.status_resep==="menunggu"?"selected":"" %>>Menunggu</option>
+                                    <option value="diproses" <%= r.status_resep==="diproses"?"selected":"" %>>Diproses</option>
+                                    <option value="siap_diambil" <%= r.status_resep==="siap_diambil"?"selected":"" %>>Siap Diambil</option>
+                                    <option value="selesai" <%= r.status_resep==="selesai"?"selected":"" %>>Selesai</option>
+                                </select>
+                                <button type="submit" class="btn-primary px-2.5 py-1 text-[10px] font-bold rounded-lg">✓ Update</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <% }); %>
+                    <% } else { %>
+                    <tr><td colspan="5" class="py-8 text-center text-[#64756D] text-xs">Tidak ada resep aktif saat ini.</td></tr>
+                    <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Daftar Obat -->
+        <div class="card p-5">
+            <h2 class="text-sm font-extrabold text-[#0B3D2E] pb-3 border-b border-[#DCE7E0] mb-4">Inventaris Stok Obat</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-xs">
+                    <thead>
+                        <tr class="bg-[#F5F8F6] text-[#0B3D2E] font-bold border-y border-[#DCE7E0]">
+                            <th class="py-2.5 px-4 text-left">Nama Obat</th>
+                            <th class="py-2.5 px-4 text-center">Stok</th>
+                            <th class="py-2.5 px-4 text-center">Min. Stok</th>
+                            <th class="py-2.5 px-4 text-center">Exp. Date</th>
+                            <th class="py-2.5 px-4 text-center">Status</th>
+                            <th class="py-2.5 px-4 text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#DCE7E0]">
+                    <% obatList.forEach(function(ob) { %>
+                    <% const kritis = ob.stok_sekarang<=ob.stok_minimal; %>
+                    <tr class="hover:bg-slate-50/60 <%= kritis?'bg-red-50/20':'' %>">
+                        <td class="py-3 px-4 font-semibold text-[#182923]"><%= ob.nama_obat %></td>
+                        <td class="py-3 px-4 text-center font-bold <%= kritis?'text-red-600':'text-[#0B3D2E]' %>"><%= ob.stok_sekarang %> <span class="text-[#64756D] font-normal"><%= ob.satuan %></span></td>
+                        <td class="py-3 px-4 text-center text-[#64756D]"><%= ob.stok_minimal %></td>
+                        <td class="py-3 px-4 text-center text-[#64756D]"><%= ob.exp_date ? new Date(ob.exp_date).toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"}) : "-" %></td>
+                        <td class="py-3 px-4 text-center">
+                            <% if (kritis) { %>
+                            <span class="badge-p1 px-2 py-0.5 rounded-full text-[10px] font-bold">KRITIS</span>
+                            <% } else { %>
+                            <span class="badge-p3 px-2 py-0.5 rounded-full text-[10px] font-bold">AMAN</span>
+                            <% } %>
+                        </td>
+                        <td class="py-3 px-4 text-right">
+                            <button onclick='editObat(<%- JSON.stringify(ob) %>)' class="px-2.5 py-1.5 bg-[#16845B]/10 text-[#16845B] rounded-lg font-bold text-[10px] hover:bg-[#16845B]/20">Edit</button>
+                        </td>
+                    </tr>
+                    <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Modal Obat -->
+<dialog id="modalObat" class="rounded-2xl shadow-2xl w-full max-w-lg p-0 backdrop:bg-black/40">
+    <div class="bg-[#0B3D2E] px-6 py-4 rounded-t-2xl flex items-center justify-between">
+        <h2 id="obatModalTitle" class="text-white font-bold text-sm">Tambah / Edit Obat</h2>
+        <button onclick="document.getElementById('modalObat').close()" class="text-white/60 hover:text-white">✕</button>
+    </div>
+    <form method="POST" action="/farmasi/obat/simpan" class="p-6 grid grid-cols-2 gap-4">
+        <input type="hidden" name="id" id="obatId">
+        <div class="col-span-2">
+            <label class="text-xs font-semibold text-[#64756D] block mb-1">Nama Obat *</label>
+            <input type="text" name="nama_obat" id="oNama" required class="w-full px-3 py-2 border border-[#DCE7E0] rounded-xl text-sm focus:outline-none focus:border-[#16845B]">
+        </div>
+        <div>
+            <label class="text-xs font-semibold text-[#64756D] block mb-1">Satuan</label>
+            <input type="text" name="satuan" id="oSatuan" placeholder="tablet / kapsul / botol" class="w-full px-3 py-2 border border-[#DCE7E0] rounded-xl text-sm focus:outline-none focus:border-[#16845B]">
+        </div>
+        <div>
+            <label class="text-xs font-semibold text-[#64756D] block mb-1">Stok Sekarang</label>
+            <input type="number" name="stok_sekarang" id="oStok" min="0" class="w-full px-3 py-2 border border-[#DCE7E0] rounded-xl text-sm focus:outline-none focus:border-[#16845B]">
+        </div>
+        <div>
+            <label class="text-xs font-semibold text-[#64756D] block mb-1">Stok Minimal</label>
+            <input type="number" name="stok_minimal" id="oMin" min="0" class="w-full px-3 py-2 border border-[#DCE7E0] rounded-xl text-sm focus:outline-none focus:border-[#16845B]">
+        </div>
+        <div>
+            <label class="text-xs font-semibold text-[#64756D] block mb-1">Exp. Date</label>
+            <input type="date" name="exp_date" id="oExp" class="w-full px-3 py-2 border border-[#DCE7E0] rounded-xl text-sm focus:outline-none focus:border-[#16845B]">
+        </div>
+        <div>
+            <label class="text-xs font-semibold text-[#64756D] block mb-1">Harga Satuan (Rp)</label>
+            <input type="number" name="harga_satuan" id="oHarga" min="0" class="w-full px-3 py-2 border border-[#DCE7E0] rounded-xl text-sm focus:outline-none focus:border-[#16845B]">
+        </div>
+        <div class="col-span-2 flex justify-end gap-3 pt-2">
+            <button type="button" onclick="document.getElementById('modalObat').close()" class="px-4 py-2 rounded-xl border border-[#DCE7E0] text-sm text-[#64756D]">Batal</button>
+            <button type="submit" class="btn-primary px-5 py-2 text-sm font-bold rounded-xl">Simpan</button>
+        </div>
+    </form>
+</dialog>
+
+<script>
+function editObat(ob) {
+    document.getElementById("obatId").value = ob.id;
+    document.getElementById("oNama").value = ob.nama_obat||"";
+    document.getElementById("oSatuan").value = ob.satuan||"";
+    document.getElementById("oStok").value = ob.stok_sekarang||0;
+    document.getElementById("oMin").value = ob.stok_minimal||0;
+    document.getElementById("oExp").value = ob.exp_date ? new String(ob.exp_date).slice(0,10) : "";
+    document.getElementById("oHarga").value = ob.harga_satuan||0;
+    document.getElementById("modalObat").showModal();
+}
+</script>
+
+<%- include("partials/footer") %>
