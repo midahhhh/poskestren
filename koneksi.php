@@ -37,13 +37,14 @@ if ($is_ssl) {
     $conn->options(MYSQLI_OPT_SSL_VERIFY_SERVER_CERT, false);
 }
 
-$conn->options(MYSQLI_OPT_CONNECT_TIMEOUT, 3);
+$conn->options(MYSQLI_OPT_CONNECT_TIMEOUT, 5);
 
 $db_connected = false;
 $db_error = '';
 
 try {
-    $connected = @$conn->real_connect($host, $user, $password, $database, $port);
+    $flags = $is_ssl ? MYSQLI_CLIENT_SSL : 0;
+    $connected = @$conn->real_connect($host, $user, $password, $database, $port, NULL, $flags);
     if (!$connected || $conn->connect_error) {
         $db_error = $conn->connect_error ?: mysqli_connect_error();
         $db_connected = false;
