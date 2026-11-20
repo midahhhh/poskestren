@@ -10,7 +10,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Konfigurasi Database (Mendukung Environment Variables untuk Vercel / Cloud Database & Fallback XAMPP Lokal)
-$is_vercel = (getenv('VERCEL') == '1' || isset($_SERVER['VERCEL']));
+$is_vercel = (getenv('VERCEL') == '1' || isset($_SERVER['VERCEL']) || isset($_ENV['VERCEL']) || is_dir('/var/task') || (PHP_OS_FAMILY === 'Linux' && !file_exists('/opt/lampp')));
 $default_host = $is_vercel ? "gateway01.ap-northeast-1.prod.aws.tidbcloud.com" : "localhost";
 $default_port = $is_vercel ? 4000 : 3306;
 $default_user = $is_vercel ? "UyGRhsQysVSR6rK.root" : "root";
@@ -37,7 +37,7 @@ if ($is_ssl) {
     $conn->options(MYSQLI_OPT_SSL_VERIFY_SERVER_CERT, false);
 }
 
-$conn->options(MYSQLI_OPT_CONNECT_TIMEOUT, 5);
+$conn->options(MYSQLI_OPT_CONNECT_TIMEOUT, 3);
 
 $db_connected = false;
 $db_error = '';
@@ -63,7 +63,7 @@ function require_db() {
         die("<div style='font-family:sans-serif;padding:24px;background:#fee2e2;color:#991b1b;border-radius:12px;max-width:640px;margin:40px auto;border:1px solid #f87171;'>
                 <h3 style='margin-top:0;'>⚠️ Database Belum Terhubung</h3>
                 <p>Sistem tidak dapat terhubung ke host database: <code>" . htmlspecialchars($host) . ":" . $port . "</code> dengan nama database <code>" . htmlspecialchars($database) . "</code>.</p>
-                <p style='font-size:13px;color:#7f1d1d;'>Jika di Vercel, pastikan Environment Variables (<code>DB_HOST</code>, <code>DB_USER</code>, <code>DB_PASSWORD</code>, <code>DB_NAME</code>, <code>DB_PORT</code>) sudah diisi di Vercel Project Settings.</p>
+                <p style='font-size:13px;color:#7f1d1d;'>Jika di Vercel, pastikan Environment Variable <b>DB_PASSWORD</b> sudah diisi di Vercel Project Settings (Settings -> Environment Variables).</p>
                 <p style='font-size:13px;color:#7f1d1d;'>Untuk menginisialisasi atau mengisi data dummy, buka <a href='install.php' style='color:#16845B;font-weight:bold;text-decoration:underline;'>install.php</a>.</p>
                 <div style='background:#fff;padding:8px 12px;border-radius:6px;font-family:monospace;font-size:12px;color:#b91c1c;'>Error: " . htmlspecialchars($db_error) . "</div>
              </div>");
