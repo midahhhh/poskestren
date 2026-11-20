@@ -14,11 +14,12 @@ $is_vercel = (getenv('VERCEL') == '1' || isset($_SERVER['VERCEL']) || isset($_EN
 $default_host = $is_vercel ? "gateway01.ap-northeast-1.prod.aws.tidbcloud.com" : "localhost";
 $default_port = $is_vercel ? 4000 : 3306;
 $default_user = $is_vercel ? "UyGRhsQysVSR6rK.root" : "root";
-$default_database = $is_vercel ? "test" : "poskestren_albahjah";
+$default_pass = $is_vercel ? "xxlAmK97oAPty9k3" : "";
+$default_database = "poskestren_albahjah";
 
 $host     = getenv('DB_HOST') ?: (getenv('MYSQLHOST') ?: $default_host);
 $user     = getenv('DB_USER') ?: (getenv('MYSQLUSER') ?: $default_user);
-$password = getenv('DB_PASSWORD') !== false ? getenv('DB_PASSWORD') : (getenv('MYSQLPASSWORD') !== false ? getenv('MYSQLPASSWORD') : "");
+$password = getenv('DB_PASSWORD') !== false ? getenv('DB_PASSWORD') : (getenv('MYSQLPASSWORD') !== false ? getenv('MYSQLPASSWORD') : $default_pass);
 $database = getenv('DB_NAME') ?: (getenv('MYSQLDATABASE') ?: $default_database);
 $port     = (int)(getenv('DB_PORT') ?: (getenv('MYSQLPORT') ?: $default_port));
 
