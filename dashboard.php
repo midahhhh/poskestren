@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // dashboard.php - Dashboard Operasional Terpadu Poskestren Al-Bahjah
 $page_title = "Dashboard Admin";
 $page_desc  = "Ringkasan antrean, kontrol operasional, dan statistik klinis hari ini.";

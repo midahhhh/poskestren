@@ -10,11 +10,20 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Konfigurasi Database (Mendukung Environment Variables untuk Vercel / Cloud Database & Fallback XAMPP Lokal)
-$host     = getenv('DB_HOST') ?: (getenv('MYSQLHOST') ?: "localhost");
-$user     = getenv('DB_USER') ?: (getenv('MYSQLUSER') ?: "root");
+$is_vercel = (getenv('VERCEL') == '1' || isset($_SERVER['VERCEL']));
+$default_host = $is_vercel ? "gateway01.ap-northeast-1.prod.aws.tidbcloud.com" : "localhost";
+$default_port = $is_vercel ? 4000 : 3306;
+$default_user = $is_vercel ? "UyGRhsQysVSR6rK.root" : "root";
+$default_database = $is_vercel ? "test" : "poskestren_albahjah";
+
+$host     = getenv('DB_HOST') ?: (getenv('MYSQLHOST') ?: $default_host);
+$user     = getenv('DB_USER') ?: (getenv('MYSQLUSER') ?: $default_user);
 $password = getenv('DB_PASSWORD') !== false ? getenv('DB_PASSWORD') : (getenv('MYSQLPASSWORD') !== false ? getenv('MYSQLPASSWORD') : "");
-$database = getenv('DB_NAME') ?: (getenv('MYSQLDATABASE') ?: "poskestren_albahjah");
-$port     = (int)(getenv('DB_PORT') ?: (getenv('MYSQLPORT') ?: 3306));
+$database = getenv('DB_NAME') ?: (getenv('MYSQLDATABASE') ?: $default_database);
+$port     = (int)(getenv('DB_PORT') ?: (getenv('MYSQLPORT') ?: $default_port));
+
+// Matikan exception throwing bawaan PHP 8.1+ agar tidak crash saat real_connect gagal
+mysqli_report(MYSQLI_REPORT_OFF);
 
 // Inisialisasi koneksi dengan dukungan SSL Cloud Database (seperti TiDB Cloud / Aiven)
 $conn = mysqli_init();
@@ -29,17 +38,22 @@ if ($is_ssl) {
 }
 
 $conn->options(MYSQLI_OPT_CONNECT_TIMEOUT, 5);
-$connected = @$conn->real_connect($host, $user, $password, $database, $port);
 
 $db_connected = false;
 $db_error = '';
 
-if (!$connected || $conn->connect_error) {
-    $db_error = $conn->connect_error ?: mysqli_connect_error();
+try {
+    $connected = @$conn->real_connect($host, $user, $password, $database, $port);
+    if (!$connected || $conn->connect_error) {
+        $db_error = $conn->connect_error ?: mysqli_connect_error();
+        $db_connected = false;
+    } else {
+        $db_connected = true;
+        @$conn->set_charset("utf8mb4");
+    }
+} catch (Throwable $e) {
     $db_connected = false;
-} else {
-    $db_connected = true;
-    $conn->set_charset("utf8mb4");
+    $db_error = $e->getMessage();
 }
 
 // Helper: Memastikan koneksi database aktif pada halaman yang membutuhkan query

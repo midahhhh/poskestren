@@ -1,5 +1,6 @@
 <?php
 // api/index.php - Front Controller / Router untuk Vercel Serverless Multi-Page PHP
+ob_start();
 
 // Konfigurasi session save path ke /tmp agar aman di Vercel Serverless
 if (session_status() === PHP_SESSION_NONE) {

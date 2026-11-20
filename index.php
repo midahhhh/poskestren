@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // index.php - Beranda Publik Poskestren Al-Bahjah Bogor
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
