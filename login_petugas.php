@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <form method="POST" action="login_petugas.php">
                 <div class="mb-4">
                     <label class="block text-sm font-semibold text-gray-700 mb-1.5">Username</label>
-                    <input type="text" name="username" class="input-field" placeholder="admin / nakes1 / farmasi1" required autofocus>
+                    <input type="text" name="username" class="input-field" placeholder="Masukkan username akun petugas" required autofocus>
                 </div>
 
                 <div class="mb-6">
@@ -135,34 +135,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <button type="submit" class="btn-primary">Masuk ke Dashboard</button>
             </form>
-
-            <!-- Demo Credentials -->
-            <div class="mt-5 pt-4 border-t border-gray-100">
-                <p class="text-xs text-gray-400 text-center mb-2">Isi cepat akun demo:</p>
-                <div class="grid grid-cols-2 gap-2">
-                    <button onclick="isi('admin','admin123')"
-                        class="text-xs py-2 rounded-lg border border-gray-200 hover:bg-emerald-50 hover:border-emerald-300 text-gray-600 hover:text-[#16845B] transition">
-                        👨‍⚕️ Admin / Dokter
-                    </button>
-                    <button onclick="isi('nakes1','admin123')"
-                        class="text-xs py-2 rounded-lg border border-gray-200 hover:bg-blue-50 hover:border-blue-300 text-gray-600 hover:text-blue-700 transition">
-                        🩺 Dokter (nakes1)
-                    </button>
-                    <button onclick="isi('nakes2','admin123')"
-                        class="text-xs py-2 rounded-lg border border-gray-200 hover:bg-purple-50 hover:border-purple-300 text-gray-600 hover:text-purple-700 transition">
-                        💉 Perawat (nakes2)
-                    </button>
-                    <button onclick="isi('farmasi1','admin123')"
-                        class="text-xs py-2 rounded-lg border border-gray-200 hover:bg-amber-50 hover:border-amber-300 text-gray-600 hover:text-amber-700 transition">
-                        💊 Farmasi
-                    </button>
-                </div>
-                <div class="mt-3 p-2.5 bg-gray-50 rounded-lg text-[11px] text-gray-400 space-y-1">
-                    <div class="flex justify-between"><span>👨‍⚕️ admin, nakes1</span><span class="text-[#16845B] font-semibold">→ Dashboard Dokter</span></div>
-                    <div class="flex justify-between"><span>💉 nakes2</span><span class="text-gray-500 font-semibold">→ Dashboard Umum</span></div>
-                    <div class="flex justify-between"><span>💊 farmasi1</span><span class="text-amber-600 font-semibold">→ Farmasi</span></div>
-                </div>
-            </div>
         </div>
 
         <!-- Link ke portal wali -->
@@ -174,12 +146,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <a href="index.php" class="hover:underline">&larr; Kembali ke Beranda</a>
         </p>
     </div>
-
-    <script>
-        function isi(u, p) {
-            document.querySelector('[name="username"]').value = u;
-            document.querySelector('[name="password"]').value = p;
-        }
-    </script>
 </body>
 </html>
