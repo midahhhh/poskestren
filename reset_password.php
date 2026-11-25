@@ -37,7 +37,7 @@ if (empty($token)) {
         if ($expired && $expired['used']) {
             $error = "Token ini sudah pernah digunakan. Silakan buat link reset baru.";
         } else {
-            $error = "Link reset sudah kedaluwarsa (1 menit). Silakan buat link reset baru.";
+            $error = "Link reset sudah kedaluwarsa. Silakan buat link reset baru.";
         }
     }
 }

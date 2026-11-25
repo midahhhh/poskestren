@@ -32,24 +32,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = "Masukkan username atau nomor HP.";
     } else {
         // Cari user
-        $stmt = $conn->prepare("SELECT id, nama_lengkap, role, username FROM users WHERE (username = ? OR no_hp = ?) AND is_active = 1 LIMIT 1");
+        $stmt = $conn->prepare("SELECT id, nama_lengkap, role, username, no_hp FROM users WHERE (username = ? OR no_hp = ?) AND is_active = 1 LIMIT 1");
         $stmt->bind_param("ss", $identifier, $identifier);
         $stmt->execute();
         $user = $stmt->get_result()->fetch_assoc();
 
-        if (!$user) {
+        // Jika tidak ditemukan dan target adalah wali santri, cek apakah identifier adalah NIS Santri
+        if (!$user && $target === 'wali') {
+            $stmt_s = $conn->prepare("SELECT s.id as santri_id, s.nama_lengkap as nama_santri, s.user_id_wali,
+                                             u.id as wali_user_id, u.nama_lengkap as nama_wali, u.role as wali_role, u.username as wali_username
+                                      FROM santri s
+                                      LEFT JOIN users u ON u.id = s.user_id_wali AND u.is_active = 1
+                                      WHERE s.nis = ? LIMIT 1");
+            $stmt_s->bind_param("s", $identifier);
+            $stmt_s->execute();
+            $s_res = $stmt_s->get_result()->fetch_assoc();
+
+            if ($s_res) {
+                if (!empty($s_res['wali_user_id'])) {
+                    $user = [
+                        'id'           => $s_res['wali_user_id'],
+                        'nama_lengkap' => $s_res['nama_wali'] ?: ('Wali ' . $s_res['nama_santri']),
+                        'role'         => $s_res['wali_role'] ?: 'santri_wali',
+                        'username'     => $s_res['wali_username']
+                    ];
+                } else {
+                    $error = "Santri ananda <strong>" . htmlspecialchars($s_res['nama_santri']) . "</strong> (NIS: " . htmlspecialchars($identifier) . ") terdaftar, namun belum memiliki akun portal wali. Silakan <a href='login.php?tab=register' class='underline font-bold text-[#16845B]'>Daftar Baru di sini</a>.";
+                }
+            }
+        }
+
+        if (!$user && empty($error)) {
             $error = "Akun dengan username/nomor '$identifier' tidak ditemukan.";
-        } elseif ($target === 'petugas' && $user['role'] === 'santri_wali') {
+        } elseif ($user && $target === 'petugas' && $user['role'] === 'santri_wali') {
             $error = "Akun ini adalah Wali Santri. Gunakan <a href='lupa_password.php?for=wali' class='underline font-semibold'>form reset wali santri</a>.";
-        } elseif ($target === 'wali' && $user['role'] !== 'santri_wali') {
+        } elseif ($user && $target === 'wali' && $user['role'] !== 'santri_wali') {
             $error = "Akun ini adalah Petugas Medis. Gunakan <a href='lupa_password.php?for=petugas' class='underline font-semibold'>form reset petugas</a>.";
-        } else {
+        } elseif ($user) {
             // Hapus token lama yang belum dipakai
             $conn->query("DELETE FROM password_resets WHERE user_id = {$user['id']}");
 
-            // Buat token baru, expired 1 menit
+            // Buat token baru, expired 5 menit (300 detik)
             $token      = bin2hex(random_bytes(32));
-            $expires_at = date('Y-m-d H:i:s', time() + 60); // 60 detik
+            $expires_at = date('Y-m-d H:i:s', time() + 300); // 5 menit
 
             $stmt2 = $conn->prepare("INSERT INTO password_resets (user_id, token, expires_at) VALUES (?, ?, ?)");
             $stmt2->bind_param("iss", $user['id'], $token, $expires_at);
@@ -104,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="mb-5">
                 <h2 class="text-base font-bold text-[#0B3D2E] mb-1">Lupa Kata Sandi?</h2>
-                <p class="text-sm text-gray-500">Masukkan username atau nomor HP akunmu. Link reset akan tersedia selama <strong class="text-red-600">1 menit</strong>.</p>
+                <p class="text-sm text-gray-500">Masukkan nomor WhatsApp terdaftar atau NIS santri. Link reset akan berlaku selama <strong class="text-emerald-700">5 menit</strong>.</p>
             </div>
 
             <?php if (!empty($error)): ?>
@@ -117,7 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <?= $target === 'wali' ? 'Nomor WhatsApp / NIS Santri' : 'Username Akun'; ?>
                     </label>
                     <input type="text" name="identifier" class="input-field"
-                           placeholder="<?= $target === 'wali' ? '08123... atau NIS' : 'admin / nakes1'; ?>"
+                           placeholder="<?= $target === 'wali' ? 'Contoh: 08123... atau 2024-AB-0192' : 'admin / nakes1'; ?>"
                            required autofocus>
                 </div>
                 <button type="submit" class="btn-primary">Buat Link Reset Password</button>
@@ -139,10 +164,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <!-- Countdown -->
-            <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-center">
+            <div class="mb-4 p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-center">
                 <p class="text-xs text-gray-500 mb-1">Link akan kedaluwarsa dalam</p>
-                <div id="countdown" class="text-3xl font-bold text-red-600 font-mono">1:00</div>
-                <p class="text-xs text-red-500 mt-1">Setelah itu, buat link baru.</p>
+                <div id="countdown" class="text-3xl font-bold text-emerald-700 font-mono">5:00</div>
+                <p class="text-xs text-gray-500 mt-1">Segera atur kata sandi baru sebelum waktu habis.</p>
             </div>
 
             <!-- Link reset -->
@@ -155,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                class="block w-full text-center py-3 bg-[#16845B] hover:bg-[#0B3D2E] text-white font-bold rounded-xl text-sm transition mb-3">
                 Klik di Sini untuk Reset Password →
             </a>
-            <p class="text-xs text-gray-400 text-center">Link ini hanya berlaku 1 menit dari sekarang.</p>
+            <p class="text-xs text-gray-400 text-center">Link ini berlaku selama 5 menit.</p>
 
         <?php endif; ?>
 
@@ -170,8 +195,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <?php if ($step === 'sent'): ?>
 <script>
-    // Countdown 60 detik
-    let seconds = 60;
+    // Countdown 5 menit (300 detik)
+    let seconds = 300;
     const el    = document.getElementById('countdown');
     const link  = document.getElementById('reset-link');
 
@@ -180,11 +205,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         const m = Math.floor(seconds / 60);
         const s = seconds % 60;
         el.textContent = m + ':' + String(s).padStart(2, '0');
-        if (seconds <= 10) el.classList.add('text-red-700');
+        if (seconds <= 30) {
+            el.classList.remove('text-emerald-700');
+            el.classList.add('text-red-600');
+        }
         if (seconds <= 0) {
             clearInterval(timer);
             el.textContent = 'KEDALUWARSA';
-            el.classList.remove('text-red-600');
+            el.classList.remove('text-emerald-700', 'text-red-600');
             el.classList.add('text-gray-400');
             link.style.pointerEvents = 'none';
             link.style.opacity = '0.4';
