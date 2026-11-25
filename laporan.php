@@ -21,9 +21,9 @@ $tgl_mulai     = $_GET['tgl_mulai'] ?? date('Y-m-01');
 $tgl_selesai   = $_GET['tgl_selesai'] ?? date('Y-m-d');
 $jenis_laporan = $_GET['jenis'] ?? 'kunjungan';
 
-// Sanitasi tanggal
-$esc_tgl_mulai   = $conn->real_escape_string($tgl_mulai);
-$esc_tgl_selesai = $conn->real_escape_string($tgl_selesai);
+// Sanitasi tanggal aman
+$esc_tgl_mulai   = ($conn && $conn instanceof mysqli && empty($conn->connect_error)) ? $conn->real_escape_string($tgl_mulai) : addslashes($tgl_mulai);
+$esc_tgl_selesai = ($conn && $conn instanceof mysqli && empty($conn->connect_error)) ? $conn->real_escape_string($tgl_selesai) : addslashes($tgl_selesai);
 
 // Nomor Surat Resmi Berdasarkan Bulan dan Tahun
 $bln_romawi = [
@@ -258,6 +258,8 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
 // ==============================================================================
 // QUERY DATA UNTUK DOKUMEN & STATISTIK
 // ==============================================================================
+$is_db_ready = ($conn && $conn instanceof mysqli && empty($conn->connect_error));
+
 // Data Kunjungan
 $sql_lap_kunjungan = "SELECT k.*, s.nama_lengkap, s.nis, s.kamar_asrama, s.kompleks_asrama, 
                              pk.diagnosa_dokter, pk.rekomendasi_rawat, pk.suhu_tubuh, pk.tensi_darah, pk.nadi, pk.spo2
@@ -266,24 +268,32 @@ $sql_lap_kunjungan = "SELECT k.*, s.nama_lengkap, s.nis, s.kamar_asrama, s.kompl
                       LEFT JOIN pemeriksaan_klinis pk ON pk.kunjungan_id = k.id 
                       WHERE DATE(k.tanggal_berobat) BETWEEN '{$esc_tgl_mulai}' AND '{$esc_tgl_selesai}' 
                       ORDER BY k.id DESC";
-$res_lap_kunjungan = $conn->query($sql_lap_kunjungan);
+$res_lap_kunjungan = $is_db_ready ? $conn->query($sql_lap_kunjungan) : false;
 
 // Ringkasan Statistik
-$q_tot = $conn->query("SELECT COUNT(*) as c FROM kunjungan_sakit WHERE DATE(tanggal_berobat) BETWEEN '{$esc_tgl_mulai}' AND '{$esc_tgl_selesai}'");
-$tot_periode = ($q_tot && $q_tot instanceof mysqli_result) ? (int)($q_tot->fetch_assoc()['c'] ?? 0) : 0;
+$tot_periode = 0;
+$p1_periode  = 0;
+$p2_periode  = 0;
+$p3_periode  = 0;
+$inap_periode = 0;
 
-$q_p1 = $conn->query("SELECT COUNT(*) as c FROM kunjungan_sakit WHERE DATE(tanggal_berobat) BETWEEN '{$esc_tgl_mulai}' AND '{$esc_tgl_selesai}' AND (tingkat_prioritas = 'P1_Gawat_Darurat' OR skor_saw_akhir >= 0.80)");
-$p1_periode = ($q_p1 && $q_p1 instanceof mysqli_result) ? (int)($q_p1->fetch_assoc()['c'] ?? 0) : 0;
+if ($is_db_ready) {
+    $q_tot = $conn->query("SELECT COUNT(*) as c FROM kunjungan_sakit WHERE DATE(tanggal_berobat) BETWEEN '{$esc_tgl_mulai}' AND '{$esc_tgl_selesai}'");
+    $tot_periode = ($q_tot && $q_tot instanceof mysqli_result) ? (int)($q_tot->fetch_assoc()['c'] ?? 0) : 0;
 
-$q_p2 = $conn->query("SELECT COUNT(*) as c FROM kunjungan_sakit WHERE DATE(tanggal_berobat) BETWEEN '{$esc_tgl_mulai}' AND '{$esc_tgl_selesai}' AND (tingkat_prioritas = 'P2_Mendesak' OR (skor_saw_akhir >= 0.50 AND skor_saw_akhir < 0.80))");
-$p2_periode = ($q_p2 && $q_p2 instanceof mysqli_result) ? (int)($q_p2->fetch_assoc()['c'] ?? 0) : 0;
+    $q_p1 = $conn->query("SELECT COUNT(*) as c FROM kunjungan_sakit WHERE DATE(tanggal_berobat) BETWEEN '{$esc_tgl_mulai}' AND '{$esc_tgl_selesai}' AND (tingkat_prioritas = 'P1_Gawat_Darurat' OR skor_saw_akhir >= 0.80)");
+    $p1_periode = ($q_p1 && $q_p1 instanceof mysqli_result) ? (int)($q_p1->fetch_assoc()['c'] ?? 0) : 0;
 
-$q_p3 = $conn->query("SELECT COUNT(*) as c FROM kunjungan_sakit WHERE DATE(tanggal_berobat) BETWEEN '{$esc_tgl_mulai}' AND '{$esc_tgl_selesai}' AND (tingkat_prioritas = 'P3_Biasa' AND skor_saw_akhir < 0.50)");
-$p3_periode = ($q_p3 && $q_p3 instanceof mysqli_result) ? (int)($q_p3->fetch_assoc()['c'] ?? 0) : 0;
+    $q_p2 = $conn->query("SELECT COUNT(*) as c FROM kunjungan_sakit WHERE DATE(tanggal_berobat) BETWEEN '{$esc_tgl_mulai}' AND '{$esc_tgl_selesai}' AND (tingkat_prioritas = 'P2_Mendesak' OR (skor_saw_akhir >= 0.50 AND skor_saw_akhir < 0.80))");
+    $p2_periode = ($q_p2 && $q_p2 instanceof mysqli_result) ? (int)($q_p2->fetch_assoc()['c'] ?? 0) : 0;
 
-// Statistik Disposisi
-$q_inap = $conn->query("SELECT COUNT(*) as c FROM pemeriksaan_klinis pk JOIN kunjungan_sakit k ON pk.kunjungan_id = k.id WHERE DATE(k.tanggal_berobat) BETWEEN '{$esc_tgl_mulai}' AND '{$esc_tgl_selesai}' AND pk.rekomendasi_rawat LIKE '%Inap%'");
-$inap_periode = ($q_inap && $q_inap instanceof mysqli_result) ? (int)($q_inap->fetch_assoc()['c'] ?? 0) : 0;
+    $q_p3 = $conn->query("SELECT COUNT(*) as c FROM kunjungan_sakit WHERE DATE(tanggal_berobat) BETWEEN '{$esc_tgl_mulai}' AND '{$esc_tgl_selesai}' AND (tingkat_prioritas = 'P3_Biasa' AND skor_saw_akhir < 0.50)");
+    $p3_periode = ($q_p3 && $q_p3 instanceof mysqli_result) ? (int)($q_p3->fetch_assoc()['c'] ?? 0) : 0;
+
+    // Statistik Disposisi
+    $q_inap = $conn->query("SELECT COUNT(*) as c FROM pemeriksaan_klinis pk JOIN kunjungan_sakit k ON pk.kunjungan_id = k.id WHERE DATE(k.tanggal_berobat) BETWEEN '{$esc_tgl_mulai}' AND '{$esc_tgl_selesai}' AND pk.rekomendasi_rawat LIKE '%Inap%'");
+    $inap_periode = ($q_inap && $q_inap instanceof mysqli_result) ? (int)($q_inap->fetch_assoc()['c'] ?? 0) : 0;
+}
 
 // Data 5 Besar Diagnosa Penyakit
 $sql_top_diag = "SELECT diagnosa_dokter, COUNT(*) as jml 
@@ -291,7 +301,7 @@ $sql_top_diag = "SELECT diagnosa_dokter, COUNT(*) as jml
                  JOIN kunjungan_sakit k ON pk.kunjungan_id = k.id 
                  WHERE DATE(k.tanggal_berobat) BETWEEN '{$esc_tgl_mulai}' AND '{$esc_tgl_selesai}' AND diagnosa_dokter IS NOT NULL AND diagnosa_dokter != '' 
                  GROUP BY diagnosa_dokter ORDER BY jml DESC LIMIT 5";
-$res_top_diag = $conn->query($sql_top_diag);
+$res_top_diag = $is_db_ready ? $conn->query($sql_top_diag) : false;
 
 // Data 5 Besar Pemakaian Obat
 $sql_top_obat = "SELECT o.nama_obat, o.satuan, SUM(rd.jumlah) as total_keluar 
@@ -301,7 +311,7 @@ $sql_top_obat = "SELECT o.nama_obat, o.satuan, SUM(rd.jumlah) as total_keluar
                  JOIN obat o ON rd.obat_id = o.id 
                  WHERE DATE(k.tanggal_berobat) BETWEEN '{$esc_tgl_mulai}' AND '{$esc_tgl_selesai}' AND r.status_resep = 'selesai' 
                  GROUP BY o.id ORDER BY total_keluar DESC LIMIT 5";
-$res_top_obat = $conn->query($sql_top_obat);
+$res_top_obat = $is_db_ready ? $conn->query($sql_top_obat) : false;
 
 // Data Mutasi Obat jika jenis = obat
 $sql_lap_obat = "SELECT m.*, o.kode_obat, o.nama_obat, o.satuan 
@@ -309,7 +319,7 @@ $sql_lap_obat = "SELECT m.*, o.kode_obat, o.nama_obat, o.satuan
                  JOIN obat o ON m.obat_id = o.id 
                  WHERE DATE(m.created_at) BETWEEN '{$esc_tgl_mulai}' AND '{$esc_tgl_selesai}' 
                  ORDER BY m.id DESC";
-$res_lap_obat = ($jenis_laporan === 'obat') ? $conn->query($sql_lap_obat) : null;
+$res_lap_obat = ($is_db_ready && $jenis_laporan === 'obat') ? $conn->query($sql_lap_obat) : null;
 
 // ==============================================================================
 // 3. FITUR CETAK LEMBAR RESMI MANDIRI (STANDALONE PRINT VIEW DENGAN KOP SURAT)
