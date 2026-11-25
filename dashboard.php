@@ -117,12 +117,17 @@ $res_obat = $conn->query(
     <!-- ANTREAN & DATA PASIEN SEMBUH (2/3) -->
     <div class="lg:col-span-2 space-y-5">
         <div class="card">
-            <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between flex-wrap gap-2">
                 <div>
                     <h2 class="text-sm font-bold text-[#0B3D2E]">Antrean Triase Aktif</h2>
                     <p class="text-xs text-gray-400 mt-0.5">Urutan prioritas berdasarkan skor SAW</p>
                 </div>
-                <a href="triase.php" class="text-xs font-semibold text-white bg-[#16845B] hover:bg-[#0B3D2E] px-3 py-1.5 rounded transition">+ Input Triase</a>
+                <div class="flex items-center gap-2">
+                    <a href="rekam_medis_admin.php" class="text-xs font-semibold text-[#0B3D2E] bg-slate-100 hover:bg-slate-200 border border-[#DCE7E0] px-3 py-1.5 rounded transition">
+                        Rekam Medis Pasien →
+                    </a>
+                    <a href="triase.php" class="text-xs font-semibold text-white bg-[#16845B] hover:bg-[#0B3D2E] px-3 py-1.5 rounded transition">+ Input Triase</a>
+                </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
@@ -213,6 +218,7 @@ $res_obat = $conn->query(
                             <th class="px-4 py-3 text-left">Dokter Pemeriksa</th>
                             <th class="px-4 py-3 text-left">Catatan Evaluasi Pemulihan</th>
                             <th class="px-4 py-3 text-center">Status</th>
+                            <th class="px-4 py-3 text-right">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -245,10 +251,16 @@ $res_obat = $conn->query(
                                     <span>Sembuh &amp; KBM</span>
                                 </span>
                             </td>
+                            <td class="px-4 py-3 text-right whitespace-nowrap">
+                                <a href="rekam_medis_admin.php?detail_id=<?= $sb['id']; ?>" class="text-xs font-bold text-[#16845B] hover:text-[#0B3D2E] border border-emerald-300 bg-white hover:bg-emerald-50 px-2.5 py-1 rounded transition inline-flex items-center gap-1">
+                                    <span>Lihat EMR</span>
+                                    <span>→</span>
+                                </a>
+                            </td>
                         </tr>
                         <?php endwhile; else: ?>
                         <tr>
-                            <td colspan="6" class="px-4 py-8 text-center text-sm text-gray-400">
+                            <td colspan="7" class="px-4 py-8 text-center text-sm text-gray-400">
                                 Belum ada data santri yang dinyatakan sembuh.
                             </td>
                         </tr>

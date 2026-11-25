@@ -3,8 +3,10 @@
 
 // Konfigurasi Session untuk Serverless (Vercel) / Lingkungan Shared
 if (session_status() === PHP_SESSION_NONE) {
-    if (getenv('VERCEL') || !is_writable(session_save_path())) {
+    if (getenv('VERCEL') || is_dir('/var/task')) {
         @ini_set('session.save_path', '/tmp');
+    } elseif (!empty(session_save_path()) && !@is_writable(session_save_path())) {
+        @ini_set('session.save_path', sys_get_temp_dir());
     }
     session_start();
 }
@@ -47,8 +49,35 @@ try {
     $flags = $is_ssl ? MYSQLI_CLIENT_SSL : 0;
     $connected = @$conn->real_connect($host, $user, $password, $database, $port, NULL, $flags);
     if (!$connected || $conn->connect_error) {
-        $db_error = $conn->connect_error ?: mysqli_connect_error();
-        $db_connected = false;
+        // Fallback otomatis: Jika localhost mati dan tidak ada custom DB_HOST, hubungkan ke TiDB Cloud
+        if ($host === 'localhost' && !getenv('DB_HOST')) {
+            $cloud_host = "gateway01.ap-northeast-1.prod.aws.tidbcloud.com";
+            $cloud_port = 4000;
+            $cloud_user = "UyGRhsQysVSR6rK.root";
+            $cloud_pass = "xxlAmK97oAPty9k3";
+            $cloud_db   = "poskestren_albahjah";
+
+            $conn->close();
+            $conn = mysqli_init();
+            $conn->ssl_set(NULL, NULL, NULL, NULL, NULL);
+            $conn->options(MYSQLI_OPT_SSL_VERIFY_SERVER_CERT, false);
+            $conn->options(MYSQLI_OPT_CONNECT_TIMEOUT, 5);
+            $cloud_connected = @$conn->real_connect($cloud_host, $cloud_user, $cloud_pass, $cloud_db, $cloud_port, NULL, MYSQLI_CLIENT_SSL);
+            if ($cloud_connected && !$conn->connect_error) {
+                $host = $cloud_host;
+                $user = $cloud_user;
+                $port = $cloud_port;
+                $database = $cloud_db;
+                $db_connected = true;
+                @$conn->set_charset("utf8mb4");
+            } else {
+                $db_error = $conn->connect_error ?: mysqli_connect_error();
+                $db_connected = false;
+            }
+        } else {
+            $db_error = $conn->connect_error ?: mysqli_connect_error();
+            $db_connected = false;
+        }
     } else {
         $db_connected = true;
         @$conn->set_charset("utf8mb4");

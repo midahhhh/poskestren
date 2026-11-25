@@ -42,6 +42,12 @@ if ($current_page === 'dashboard.php') {
     }
 }
 
+// rekam_medis_admin.php KHUSUS ADMIN (Dokter diarahkan ke rekam_medis.php)
+if ($current_page === 'rekam_medis_admin.php' && $user_role !== 'admin') {
+    set_flash('error', "Akses Ditolak: Halaman Rekam Medis Pasien ini khusus Admin.");
+    header("Location: " . ($user_role === 'petugas_kesehatan' ? 'rekam_medis.php' : 'login_petugas.php')); exit();
+}
+
 // farmasi.php KHUSUS ADMIN (Apoteker diarahkan ke dashboard_farmasi.php)
 if ($current_page === 'farmasi.php' && $user_role !== 'admin') {
     set_flash('error', "Akses Ditolak: Modul Farmasi utama khusus Admin. Silakan kelola resep melalui Dashboard Farmasi.");
@@ -328,10 +334,15 @@ $role_map = [
                 </a>
                 <?php endif; ?>
 
-                <?php if (in_array($user_role, ['admin','petugas_kesehatan'])): ?>
+                <?php if ($user_role === 'admin'): ?>
+                <a href="rekam_medis_admin.php" class="nav-link <?= in_array($current_page, ['rekam_medis_admin.php', 'rekam_medis.php']) ? 'active' : ''; ?>">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    Rekam Medis Pasien
+                </a>
+                <?php elseif ($user_role === 'petugas_kesehatan'): ?>
                 <a href="rekam_medis.php" class="nav-link <?= $current_page == 'rekam_medis.php' ? 'active' : ''; ?>">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    Rekam Medis
+                    Rekam Medis (EMR)
                 </a>
                 <?php endif; ?>
 

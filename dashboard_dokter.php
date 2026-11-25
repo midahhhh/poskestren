@@ -23,6 +23,12 @@ if ($user_role !== 'petugas_kesehatan' && $user_role !== 'admin') {
     exit();
 }
 
+$is_admin         = ($user_role === 'admin');
+$unit_badge       = $is_admin ? 'Admin Medis' : 'Poli Dokter';
+$unit_badge_class = $is_admin ? 'bg-purple-50 text-purple-800 border-purple-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200';
+$user_role_label  = $is_admin ? 'Administrator Medis' : 'Dokter Pemeriksa / SIP Terdaftar';
+$logo_target_url  = $is_admin ? 'dashboard.php' : 'dashboard_dokter.php';
+
 $hari_ini = date('Y-m-d');
 
 // ════════════════════════════════════════════════════════════════════
@@ -143,15 +149,15 @@ $res_sembuh = $conn->query(
                 
                 <!-- Brand & Logo -->
                 <div class="flex items-center gap-3">
-                    <a href="dashboard_dokter.php" class="flex items-center gap-2.5">
+                    <a href="<?= $logo_target_url; ?>" class="flex items-center gap-2.5">
                         <div class="w-9 h-9 rounded-lg bg-[#0B3D2E] text-white flex items-center justify-center font-bold text-sm tracking-tight">
                             AB
                         </div>
                         <div>
                             <div class="flex items-center gap-2">
                                 <span class="font-bold text-sm text-[#0B3D2E] tracking-tight">Poskestren Al-Bahjah</span>
-                                <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                                    Poli Dokter
+                                <span class="px-2 py-0.5 rounded text-[10px] font-semibold <?= $unit_badge_class; ?>">
+                                    <?= $unit_badge; ?>
                                 </span>
                             </div>
                             <p class="text-[11px] text-[#64756D] leading-none mt-0.5">Sistem Pelayanan Rekam Medis & Triase Santri</p>
@@ -160,7 +166,13 @@ $res_sembuh = $conn->query(
                 </div>
 
                 <!-- Navigation Links -->
-                <nav class="hidden md:flex items-center gap-1 text-xs font-semibold text-[#64756D]">
+                <nav class="hidden md:flex items-center gap-1.5 text-xs font-semibold text-[#64756D]">
+                    <?php if ($is_admin): ?>
+                    <a href="dashboard.php" class="px-3 py-1.5 rounded-lg bg-[#0B3D2E] text-white font-bold hover:bg-[#16845B] transition flex items-center gap-1.5 shadow-2xs">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                        <span>Dashboard Admin</span>
+                    </a>
+                    <?php endif; ?>
                     <a href="dashboard_dokter.php" class="px-3 py-2 rounded-lg bg-emerald-50 text-[#0B3D2E] font-bold">
                         Antrean Pasien
                     </a>
@@ -173,13 +185,13 @@ $res_sembuh = $conn->query(
                     </a>
                 </nav>
 
-                <!-- Doctor Profile & Logout -->
+                <!-- Doctor / Admin Profile & Logout -->
                 <div class="flex items-center gap-2 sm:gap-3">
                     <div class="text-right hidden sm:block">
                         <span class="block text-xs font-bold text-[#0B3D2E] leading-tight"><?= htmlspecialchars($user_name); ?></span>
-                        <span class="block text-[10px] text-[#64756D]">Dokter Pemeriksa / SIP Terdaftar</span>
+                        <span class="block text-[10px] text-[#64756D]"><?= $user_role_label; ?></span>
                     </div>
-                    <a href="logout.php" onclick="return confirm('Keluar dari sesi dokter?')" 
+                    <a href="logout.php" onclick="return confirm('Keluar dari sesi?')" 
                        class="hidden sm:flex px-3 py-1.5 rounded-lg border border-[#DCE7E0] hover:bg-red-50 hover:border-red-200 hover:text-[#D64545] text-xs font-semibold text-[#64756D] transition items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                         <span>Keluar</span>
@@ -196,6 +208,11 @@ $res_sembuh = $conn->query(
 
         <!-- Mobile Navigation Menu (Collapsible) -->
         <div id="mobile-nav-dokter" class="hidden md:hidden px-4 py-3 border-t border-[#DCE7E0] bg-white space-y-1.5">
+            <?php if ($is_admin): ?>
+            <a href="dashboard.php" class="block px-3 py-2 rounded-lg bg-[#0B3D2E] text-white font-bold text-xs">
+                ← Kembali ke Dashboard Admin
+            </a>
+            <?php endif; ?>
             <a href="dashboard_dokter.php" class="block px-3 py-2 rounded-lg bg-emerald-50 text-[#0B3D2E] font-bold text-xs">
                 Antrean Pasien
             </a>
@@ -208,9 +225,9 @@ $res_sembuh = $conn->query(
             <div class="pt-2 mt-1 border-t border-[#DCE7E0] flex items-center justify-between px-1">
                 <div>
                     <span class="block text-xs font-bold text-[#0B3D2E]"><?= htmlspecialchars($user_name); ?></span>
-                    <span class="block text-[10px] text-[#64756D]">Dokter Pemeriksa</span>
+                    <span class="block text-[10px] text-[#64756D]"><?= $user_role_label; ?></span>
                 </div>
-                <a href="logout.php" onclick="return confirm('Keluar dari sesi dokter?')" class="px-2.5 py-1 text-xs font-bold text-red-600 bg-red-50 rounded-md border border-red-200">
+                <a href="logout.php" onclick="return confirm('Keluar dari sesi?')" class="px-2.5 py-1 text-xs font-bold text-red-600 bg-red-50 rounded-md border border-red-200">
                     Keluar
                 </a>
             </div>
@@ -221,6 +238,20 @@ $res_sembuh = $conn->query(
     <!-- MAIN WORKSPACE                                                 -->
     <!-- ============================================================== -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-5 flex-1 w-full">
+
+        <?php if ($is_admin): ?>
+        <!-- Admin Notice Banner -->
+        <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs font-medium text-blue-900 flex flex-col sm:flex-row sm:items-center justify-between gap-2 no-print shadow-2xs">
+            <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-blue-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Anda sedang mengakses <strong>Dashboard Dokter</strong> dalam mode <strong>Administrator</strong>.</span>
+            </div>
+            <a href="dashboard.php" class="px-3 py-1.5 rounded-md bg-[#0B3D2E] hover:bg-[#16845B] text-white font-bold transition inline-flex items-center gap-1.5 self-start sm:self-auto text-xs shadow-2xs">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                <span>Kembali ke Dashboard Admin</span>
+            </a>
+        </div>
+        <?php endif; ?>
 
         <!-- Flash Message Notification -->
         <?php 

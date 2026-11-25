@@ -23,6 +23,14 @@ if ($user_role !== 'petugas_kesehatan' && $user_role !== 'admin') {
     exit();
 }
 
+$is_admin = ($user_role === 'admin');
+$dashboard_kembali_url   = $is_admin ? 'dashboard.php' : 'dashboard_dokter.php';
+$dashboard_kembali_label = $is_admin ? '← Kembali ke Dashboard Admin' : '← Kembali ke Dashboard Dokter';
+$user_role_label         = $is_admin ? 'Administrator Medis' : 'Dokter Pemeriksa / SIP Terdaftar';
+$unit_badge              = $is_admin ? 'Admin Medis' : 'Poli Dokter';
+$unit_badge_class        = $is_admin ? 'bg-purple-50 text-purple-800 border-purple-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200';
+$farmasi_kembali_url     = $is_admin ? 'farmasi.php' : 'dashboard_farmasi.php';
+
 $kunjungan_id = (int)($_GET['kunjungan_id'] ?? 0);
 $err = "";
 
@@ -249,17 +257,17 @@ $q_ready = $conn->query(
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 
-                <!-- Brand & Logo (Sama Persis seperti di Dashboard Dokter) -->
+                <!-- Brand & Logo -->
                 <div class="flex items-center gap-3">
-                    <a href="dashboard_dokter.php" class="flex items-center gap-2.5">
+                    <a href="<?= $dashboard_kembali_url; ?>" class="flex items-center gap-2.5">
                         <div class="w-9 h-9 rounded-lg bg-[#0B3D2E] text-white flex items-center justify-center font-bold text-sm tracking-tight">
                             AB
                         </div>
                         <div>
                             <div class="flex items-center gap-2">
                                 <span class="font-bold text-sm text-[#0B3D2E] tracking-tight">Poskestren Al-Bahjah</span>
-                                <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                                    Poli Dokter
+                                <span class="px-2 py-0.5 rounded text-[10px] font-semibold <?= $unit_badge_class; ?>">
+                                    <?= $unit_badge; ?>
                                 </span>
                             </div>
                             <p class="text-[11px] text-[#64756D] leading-none mt-0.5">Sistem Pelayanan Rekam Medis & Triase Santri</p>
@@ -267,11 +275,20 @@ $q_ready = $conn->query(
                     </a>
                 </div>
 
-                <!-- Navigation Links (Sama Persis seperti di Dashboard Dokter) -->
+                <!-- Navigation Links -->
                 <nav class="hidden md:flex items-center gap-1 text-xs font-semibold text-[#64756D]">
+                    <?php if ($is_admin): ?>
+                    <a href="dashboard.php" class="px-3 py-2 rounded-lg text-[#0B3D2E] bg-slate-100 font-bold hover:bg-slate-200 transition">
+                        Dashboard Admin
+                    </a>
+                    <a href="dashboard_dokter.php" class="px-3 py-2 rounded-lg hover:text-[#0B3D2E] hover:bg-slate-100 transition">
+                        Antrean Dokter
+                    </a>
+                    <?php else: ?>
                     <a href="dashboard_dokter.php" class="px-3 py-2 rounded-lg hover:text-[#0B3D2E] hover:bg-slate-100 transition">
                         Antrean Pasien
                     </a>
+                    <?php endif; ?>
                     <a href="rekam_medis.php" class="px-3 py-2 rounded-lg bg-emerald-50 text-[#0B3D2E] font-bold">
                         Rekam Medis (EMR)
                     </a>
@@ -280,13 +297,13 @@ $q_ready = $conn->query(
                     </a>
                 </nav>
 
-                <!-- Doctor Profile & Logout (Sama Persis seperti di Dashboard Dokter) -->
+                <!-- Doctor / Admin Profile & Logout -->
                 <div class="flex items-center gap-2 sm:gap-3">
                     <div class="text-right hidden sm:block">
                         <span class="block text-xs font-bold text-[#0B3D2E] leading-tight"><?= htmlspecialchars($user_name); ?></span>
-                        <span class="block text-[10px] text-[#64756D]">Dokter Pemeriksa / SIP Terdaftar</span>
+                        <span class="block text-[10px] text-[#64756D]"><?= $user_role_label; ?></span>
                     </div>
-                    <a href="logout.php" onclick="return confirm('Keluar dari sesi dokter?')" 
+                    <a href="logout.php" onclick="return confirm('Keluar dari sesi?')" 
                        class="hidden sm:flex px-3 py-1.5 rounded-lg border border-[#DCE7E0] hover:bg-red-50 hover:border-red-200 hover:text-[#D64545] text-xs font-semibold text-[#64756D] transition items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                         <span>Keluar</span>
@@ -303,9 +320,18 @@ $q_ready = $conn->query(
 
         <!-- Mobile Navigation Menu (Collapsible) -->
         <div id="mobile-nav-rekam" class="hidden md:hidden px-4 py-3 border-t border-[#DCE7E0] bg-white space-y-1.5 no-print">
+            <?php if ($is_admin): ?>
+            <a href="dashboard.php" class="block px-3 py-2 rounded-lg bg-emerald-50 text-[#0B3D2E] font-bold text-xs">
+                Dashboard Admin
+            </a>
+            <a href="dashboard_dokter.php" class="block px-3 py-2 rounded-lg text-[#64756D] hover:bg-slate-100 font-semibold text-xs">
+                Antrean Dokter
+            </a>
+            <?php else: ?>
             <a href="dashboard_dokter.php" class="block px-3 py-2 rounded-lg text-[#64756D] hover:bg-slate-100 font-semibold text-xs">
                 Antrean Pasien
             </a>
+            <?php endif; ?>
             <a href="rekam_medis.php" class="block px-3 py-2 rounded-lg bg-emerald-50 text-[#0B3D2E] font-bold text-xs">
                 Rekam Medis (EMR)
             </a>
@@ -315,9 +341,9 @@ $q_ready = $conn->query(
             <div class="pt-2 mt-1 border-t border-[#DCE7E0] flex items-center justify-between px-1">
                 <div>
                     <span class="block text-xs font-bold text-[#0B3D2E]"><?= htmlspecialchars($user_name); ?></span>
-                    <span class="block text-[10px] text-[#64756D]">Dokter Pemeriksa</span>
+                    <span class="block text-[10px] text-[#64756D]"><?= $user_role_label; ?></span>
                 </div>
-                <a href="logout.php" onclick="return confirm('Keluar dari sesi dokter?')" class="px-2.5 py-1 text-xs font-bold text-red-600 bg-red-50 rounded-md border border-red-200">
+                <a href="logout.php" onclick="return confirm('Keluar dari sesi?')" class="px-2.5 py-1 text-xs font-bold text-red-600 bg-red-50 rounded-md border border-red-200">
                     Keluar
                 </a>
             </div>
@@ -351,6 +377,18 @@ $q_ready = $conn->query(
         </div>
         <?php endif; ?>
 
+        <?php if ($is_admin): ?>
+        <div class="p-3 bg-purple-50 border border-purple-200 rounded-lg text-xs font-medium text-purple-900 flex flex-col sm:flex-row sm:items-center justify-between gap-2 no-print shadow-2xs">
+            <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-purple-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Anda membuka antrean input klinis dokter. Untuk melihat data pasien yang <strong>sudah diperiksa</strong>, silakan buka <strong>Rekam Medis Admin</strong>.</span>
+            </div>
+            <a href="rekam_medis_admin.php" class="px-3 py-1 rounded-md bg-[#0B3D2E] hover:bg-[#16845B] text-white font-bold transition flex items-center gap-1 shadow-2xs self-start sm:self-auto">
+                Buka Rekam Medis Admin →
+            </a>
+        </div>
+        <?php endif; ?>
+
         <?php if (!$kunjungan): ?>
         <!-- ========================================================== -->
         <!-- VIEW 1: DAFTAR ANTREAN PASIEN SIAP DIPERIKSA DOKTER        -->
@@ -361,9 +399,16 @@ $q_ready = $conn->query(
                     <h2 class="font-bold text-sm text-[#0B3D2E]">Antrean Pasien Menunggu Pemeriksaan Klinis (SOAP)</h2>
                     <p class="text-xs text-[#64756D]">Pilih santri untuk membuka lembar rekam medis, input diagnosa, dan menerbitkan resep elektronik.</p>
                 </div>
-                <a href="dashboard_dokter.php" class="px-3 py-1.5 rounded-lg border border-[#DCE7E0] text-[#0B3D2E] text-xs font-semibold hover:bg-slate-50 transition">
-                    ← Kembali ke Dashboard
-                </a>
+                <div class="flex items-center gap-2">
+                    <?php if ($is_admin): ?>
+                    <a href="rekam_medis_admin.php" class="px-3 py-1.5 rounded-lg bg-[#0B3D2E] hover:bg-[#16845B] text-white text-xs font-semibold transition shadow-2xs">
+                        Rekam Medis Admin →
+                    </a>
+                    <?php endif; ?>
+                    <a href="<?= $dashboard_kembali_url; ?>" class="px-3 py-1.5 rounded-lg border border-[#DCE7E0] text-[#0B3D2E] text-xs font-semibold hover:bg-slate-50 transition">
+                        <?= $dashboard_kembali_label; ?>
+                    </a>
+                </div>
             </div>
 
             <div class="overflow-x-auto">
@@ -425,10 +470,16 @@ $q_ready = $conn->query(
         <!-- ========================================================== -->
         <!-- VIEW 2: LEMBAR REKAM MEDIS SANTRI TERPILIH                 -->
         <!-- ========================================================== -->
-        <div class="flex items-center justify-between no-print">
-            <a href="rekam_medis.php" class="text-xs font-semibold text-[#16845B] hover:text-[#0B3D2E] transition flex items-center gap-1">
-                <span>← Kembali ke Antrean Santri</span>
-            </a>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between no-print gap-2">
+            <div class="flex items-center gap-2.5">
+                <a href="rekam_medis.php" class="text-xs font-semibold text-[#16845B] hover:text-[#0B3D2E] transition flex items-center gap-1">
+                    <span>← Kembali ke Antrean Santri</span>
+                </a>
+                <span class="text-[#DCE7E0]">|</span>
+                <a href="<?= $dashboard_kembali_url; ?>" class="text-xs font-semibold text-[#64756D] hover:text-[#0B3D2E] transition">
+                    <?= $dashboard_kembali_label; ?>
+                </a>
+            </div>
             <div class="text-xs text-[#64756D]">
                 Status Kunjungan: <strong class="text-[#0B3D2E] uppercase font-bold"><?= str_replace('_', ' ', $kunjungan['status_antrean']); ?></strong>
             </div>
@@ -660,7 +711,7 @@ $q_ready = $conn->query(
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
                                 <span>Cetak Surat Izin Sakit</span>
                             </button>
-                            <a href="dashboard_farmasi.php" class="block w-full py-2 rounded-lg border border-[#DCE7E0] text-center text-xs font-semibold text-[#0B3D2E] hover:bg-slate-50 transition">
+                            <a href="<?= $farmasi_kembali_url; ?>" class="block w-full py-2 rounded-lg border border-[#DCE7E0] text-center text-xs font-semibold text-[#0B3D2E] hover:bg-slate-50 transition">
                                 Buka Unit Farmasi Obat →
                             </a>
                         </div>
