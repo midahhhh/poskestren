@@ -17,17 +17,23 @@ $user_role = $_SESSION['role'] ?? 'guest';
 $user_name = $_SESSION['nama_lengkap'] ?? ($_SESSION['username'] ?? 'Dokter Pemeriksa');
 $user_id   = (int)$_SESSION['user_id'];
 
-if ($user_role !== 'petugas_kesehatan' && $user_role !== 'admin') {
+// Otorisasi Ketat: dashboard_dokter.php KHUSUS Tenaga Medis / Dokter
+if ($user_role === 'admin') {
+    header("Location: dashboard.php");
+    exit();
+}
+
+if ($user_role !== 'petugas_kesehatan') {
     set_flash('error', "Akses Ditolak: Halaman ini khusus diperuntukkan bagi Dokter & Tenaga Medis.");
     header("Location: login_petugas.php");
     exit();
 }
 
-$is_admin         = ($user_role === 'admin');
-$unit_badge       = $is_admin ? 'Admin Medis' : 'Poli Dokter';
-$unit_badge_class = $is_admin ? 'bg-purple-50 text-purple-800 border-purple-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200';
-$user_role_label  = $is_admin ? 'Administrator Medis' : 'Dokter Pemeriksa / SIP Terdaftar';
-$logo_target_url  = $is_admin ? 'dashboard.php' : 'dashboard_dokter.php';
+$is_admin         = false;
+$unit_badge       = 'Poli Dokter';
+$unit_badge_class = 'bg-emerald-50 text-emerald-800 border-emerald-200';
+$user_role_label  = 'Dokter Pemeriksa / SIP Terdaftar';
+$logo_target_url  = 'dashboard_dokter.php';
 
 $hari_ini = date('Y-m-d');
 

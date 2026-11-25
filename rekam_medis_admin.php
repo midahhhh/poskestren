@@ -249,7 +249,11 @@ $res_pasien = $stmt_list->get_result();
                 </p>
             </div>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+            <a href="dashboard.php" class="px-3 py-1.5 rounded-lg border border-[#DCE7E0] bg-white text-[#0B3D2E] hover:bg-slate-50 text-xs font-semibold transition inline-flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                <span>Dashboard Admin</span>
+            </a>
             <button type="button" onclick="window.print()" class="px-3 py-1.5 rounded-lg bg-[#0B3D2E] hover:bg-[#16845B] text-white font-semibold text-xs transition flex items-center gap-1.5 shadow-2xs">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
                 <span>Cetak Lembar EMR</span>
@@ -518,9 +522,9 @@ $res_pasien = $stmt_list->get_result();
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                     <span>Lihat EMR</span>
                                 </a>
-                                <a href="rekam_medis.php?kunjungan_id=<?= $p['kunjungan_id']; ?>&action=lihat" 
-                                   class="px-2.5 py-1 rounded-lg border border-[#DCE7E0] hover:bg-slate-100 text-[#0B3D2E] font-semibold text-xs transition inline-flex items-center gap-1" title="Buka Format Surat Izin Sakit">
-                                    <span>Surat Sakit</span>
+                                <a href="rekam_medis_admin.php?detail_id=<?= $p['pemeriksaan_id']; ?>" 
+                                   class="px-2.5 py-1 rounded-lg border border-[#DCE7E0] hover:bg-slate-100 text-[#0B3D2E] font-semibold text-xs transition inline-flex items-center gap-1" title="Buka Detail Rekam Medis">
+                                    <span>Detail Medis</span>
                                 </a>
                             </div>
                         </td>

@@ -223,7 +223,7 @@ $res_diagnosa = $conn->query(
         </div>
         <div class="mt-4 flex flex-wrap gap-2">
             <a href="triase.php" class="text-xs font-semibold text-white bg-[#16845B] hover:bg-[#0B3D2E] px-3 py-2 rounded-lg transition">+ Input Triase</a>
-            <a href="rekam_medis.php" class="text-xs font-semibold text-[#0B3D2E] bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition">Buka Rekam Medis</a>
+            <a href="rekam_medis_admin.php" class="text-xs font-semibold text-[#0B3D2E] bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition">Rekam Medis Pasien</a>
             <a href="#rawat-inap" class="text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-lg transition">Monitor Rawat Inap</a>
         </div>
     </div>
@@ -358,9 +358,9 @@ $res_diagnosa = $conn->query(
 
                     <!-- Tombol Aksi -->
                     <div class="flex flex-col gap-2 pt-1">
-                        <a href="rekam_medis.php?kunjungan_id=<?= $ant['id']; ?>"
+                        <a href="rekam_medis_admin.php?detail_id=<?= $ant['id']; ?>"
                            class="text-center text-xs font-bold text-white bg-[#16845B] hover:bg-[#0B3D2E] px-3 py-2 rounded-lg transition">
-                            <?= $sudah_rekam ? '✏ Edit Rekam Medis' : '+ Buat Rekam Medis'; ?>
+                            <?= $sudah_rekam ? 'Lihat Rekam Medis' : 'Detail Rekam Medis'; ?>
                         </a>
                         <a href="triase.php?santri_id=<?= $ant['santri_id']; ?>"
                            class="text-center text-xs font-semibold text-[#0B3D2E] bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition">
@@ -463,9 +463,9 @@ $res_diagnosa = $conn->query(
                         <div class="text-2xl mb-2">⚑</div>
                         <p class="text-xs font-bold text-red-700 mb-1">Belum ada rekam medis</p>
                         <p class="text-xs text-gray-500 mb-3">Santri ini belum mendapatkan pemeriksaan dokter.</p>
-                        <a href="rekam_medis.php?kunjungan_id=<?= $ant['id']; ?>"
-                           class="text-xs font-bold text-white bg-red-500 hover:bg-red-700 px-4 py-2 rounded-lg transition">
-                            Lakukan Pemeriksaan →
+                        <a href="rekam_medis_admin.php?detail_id=<?= $ant['id']; ?>"
+                           class="text-xs font-bold text-white bg-[#0B3D2E] hover:bg-[#16845B] px-4 py-2 rounded-lg transition">
+                            Lihat Rekam Medis →
                         </a>
                     </div>
                     <?php endif; ?>

@@ -66,10 +66,14 @@ if ($current_page === 'dokter.php' && $user_role !== 'admin') {
     header("Location: dashboard_dokter.php"); exit();
 }
 
-// dashboard_dokter.php KHUSUS DOKTER & ADMIN
-if ($current_page === 'dashboard_dokter.php' && !in_array($user_role, ['petugas_kesehatan', 'admin'])) {
-    set_flash('error', "Akses Ditolak: Halaman ini khusus Dokter & Tenaga Medis.");
-    header("Location: login_petugas.php"); exit();
+// dashboard_dokter.php KHUSUS DOKTER (Admin selalu diarahkan ke dashboard.php)
+if ($current_page === 'dashboard_dokter.php') {
+    if ($user_role === 'admin') {
+        header("Location: dashboard.php"); exit();
+    } elseif ($user_role !== 'petugas_kesehatan') {
+        set_flash('error', "Akses Ditolak: Halaman ini khusus Dokter & Tenaga Medis.");
+        header("Location: login_petugas.php"); exit();
+    }
 }
 
 // Farmasi diblok dari triase, nakes, kriteria_saw, dokter, dan dashboard dokter
@@ -274,13 +278,13 @@ $role_map = [
         <!-- Brand & Close Button for Mobile -->
         <div>
             <div style="padding:16px 18px; border-bottom:1px solid rgba(255,255,255,.1); display:flex; align-items:center; justify-content:space-between; gap:10px;">
-                <div style="display:flex; align-items:center; gap:10px;">
+                <a href="<?= get_redirect_url($user_role); ?>" style="display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit;">
                     <div style="width:36px; height:36px; background:#16845B; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:#fff; flex-shrink:0;">AB</div>
                     <div>
                         <div style="font-weight:700; font-size:14px; color:#fff; line-height:1.2;">Poskestren</div>
                         <div style="font-size:11px; color:#6faa8a;">Al-Bahjah Bogor</div>
                     </div>
-                </div>
+                </a>
                 <!-- Close Button (Mobile Only) -->
                 <button type="button" onclick="toggleSidebar(false)" class="p-1.5 rounded-lg text-emerald-300 hover:text-white hover:bg-white/10 lg:hidden transition" aria-label="Tutup Menu">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>

@@ -23,13 +23,23 @@ if ($user_role !== 'petugas_kesehatan' && $user_role !== 'admin') {
     exit();
 }
 
-$is_admin = ($user_role === 'admin');
-$dashboard_kembali_url   = $is_admin ? 'dashboard.php' : 'dashboard_dokter.php';
-$dashboard_kembali_label = $is_admin ? '← Kembali ke Dashboard Admin' : '← Kembali ke Dashboard Dokter';
-$user_role_label         = $is_admin ? 'Administrator Medis' : 'Dokter Pemeriksa / SIP Terdaftar';
-$unit_badge              = $is_admin ? 'Admin Medis' : 'Poli Dokter';
-$unit_badge_class        = $is_admin ? 'bg-purple-50 text-purple-800 border-purple-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200';
-$farmasi_kembali_url     = $is_admin ? 'farmasi.php' : 'dashboard_farmasi.php';
+// Pengamanan Ketat: Jika Administrator masuk, alihkan langsung ke Rekam Medis Khusus Admin
+if ($user_role === 'admin') {
+    $target = 'rekam_medis_admin.php';
+    if (!empty($_GET['kunjungan_id'])) {
+        $target .= '?detail_id=' . (int)$_GET['kunjungan_id'];
+    }
+    header("Location: " . $target);
+    exit();
+}
+
+$is_admin = false;
+$dashboard_kembali_url   = 'dashboard_dokter.php';
+$dashboard_kembali_label = '← Kembali ke Dashboard Dokter';
+$user_role_label         = 'Dokter Pemeriksa / SIP Terdaftar';
+$unit_badge              = 'Poli Dokter';
+$unit_badge_class        = 'bg-emerald-50 text-emerald-800 border-emerald-200';
+$farmasi_kembali_url     = 'dashboard_farmasi.php';
 
 $kunjungan_id = (int)($_GET['kunjungan_id'] ?? 0);
 $err = "";

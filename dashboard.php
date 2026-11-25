@@ -170,9 +170,9 @@ $res_obat = $conn->query(
                                 <?= number_format($row['skor_saw_akhir'], 3); ?>
                             </td>
                             <td class="px-4 py-3 text-right">
-                                <a href="rekam_medis.php?kunjungan_id=<?= $row['id']; ?>"
+                                <a href="rekam_medis_admin.php?detail_id=<?= $row['id']; ?>"
                                    class="text-xs font-semibold text-white bg-[#16845B] hover:bg-[#0B3D2E] px-2.5 py-1.5 rounded transition">
-                                    Periksa
+                                    Rekam Medis
                                 </a>
                             </td>
                         </tr>

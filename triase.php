@@ -355,8 +355,9 @@ $res_hasil_saw = $conn->query($sql_hasil);
                                 <?= number_format($h['skor_saw_akhir'], 3); ?>
                             </td>
                             <td class="py-3 px-3 text-right">
-                                <a href="rekam_medis.php?kunjungan_id=<?= $h['id']; ?>" class="px-2.5 py-1.5 rounded-lg bg-[#16845B] hover:bg-[#0B3D2E] text-white font-bold text-[10px] transition shadow-2xs">
-                                    Pemeriksaan →
+                                <?php $rm_target = ($user_role === 'admin') ? "rekam_medis_admin.php?detail_id={$h['id']}" : "rekam_medis.php?kunjungan_id={$h['id']}"; ?>
+                                <a href="<?= $rm_target; ?>" class="px-2.5 py-1.5 rounded-lg bg-[#16845B] hover:bg-[#0B3D2E] text-white font-bold text-[10px] transition shadow-2xs">
+                                    <?= ($user_role === 'admin') ? 'Rekam Medis →' : 'Pemeriksaan →'; ?>
                                 </a>
                             </td>
                         </tr>
