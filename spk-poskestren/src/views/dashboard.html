@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — SPK Health Poskestren Al-Bahjah Bogor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+
+<!-- Sidebar Overlay (mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+<div class="app-layout">
+
+  <!-- ══════════════════════════════════════════════════════
+       SIDEBAR
+  ═══════════════════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Navigasi utama aplikasi">
+
+    <!-- Brand -->
+    <div class="sidebar-brand">
+      <div class="sidebar-logo" aria-hidden="true">🏥</div>
+      <div>
+        <div class="sidebar-name">SPK Health</div>
+        <div class="sidebar-sub">Poskestren Al-Bahjah</div>
+      </div>
+    </div>
+
+    <!-- User Info -->
+    <div class="sidebar-user">
+      <div class="user-avatar" aria-hidden="true">AD</div>
+      <div>
+        <div class="user-name">Admin Demo</div>
+        <div class="user-role">Petugas Kesehatan</div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sidebar-nav" aria-label="Menu navigasi">
+
+      <div class="nav-section-title">Utama</div>
+
+      <!-- Modul 3: Dashboard (active) -->
+      <a href="/dashboard/admin" class="nav-item active" aria-current="page">
+        <span class="nav-item-icon" aria-hidden="true">📊</span>
+        Dashboard
+      </a>
+
+      <div class="nav-section-title">Pelayanan Klinis</div>
+
+      <!-- Modul 4: Papan Triase -->
+      <a href="#" class="nav-item" aria-label="Papan Antrean Triase (belum tersedia, Fase 3)">
+        <span class="nav-item-icon" aria-hidden="true">🚑</span>
+        Papan Triase
+        <span class="nav-item-badge" aria-label="5 antrean">5</span>
+      </a>
+
+      <!-- Modul 5: Form Pemeriksaan & SAW -->
+      <a href="#" class="nav-item" aria-label="Form Pemeriksaan dan Engine SAW (belum tersedia, Fase 3)">
+        <span class="nav-item-icon" aria-hidden="true">🩺</span>
+        Pemeriksaan & SAW
+        <span class="nav-item-tag">Fase 3</span>
+      </a>
+
+      <div class="nav-section-title">Data Master</div>
+
+      <!-- Modul 6: CRUD Santri -->
+      <a href="#" class="nav-item" aria-label="Data Santri (belum tersedia, Fase 2)">
+        <span class="nav-item-icon" aria-hidden="true">🎓</span>
+        Data Santri
+        <span class="nav-item-tag">Fase 2</span>
+      </a>
+
+      <!-- Modul 7: CRUD Obat -->
+      <a href="#" class="nav-item" aria-label="Data Obat dan Stok Farmasi (belum tersedia, Fase 2)">
+        <span class="nav-item-icon" aria-hidden="true">💊</span>
+        Data Obat & Stok
+        <span class="nav-item-tag">Fase 2</span>
+      </a>
+
+      <div class="nav-section-title">Farmasi</div>
+
+      <!-- Modul 8: Dashboard Farmasi -->
+      <a href="#" class="nav-item" aria-label="Dashboard Farmasi dan Antrean Resep (belum tersedia, Fase 4)">
+        <span class="nav-item-icon" aria-hidden="true">🏪</span>
+        Dashboard Farmasi
+        <span class="nav-item-tag">Fase 4</span>
+      </a>
+
+      <div class="nav-section-title">Portal</div>
+
+      <!-- Modul 9: Portal Santri/Wali -->
+      <a href="#" class="nav-item" aria-label="Portal Santri dan Wali Santri (belum tersedia, Fase 4)">
+        <span class="nav-item-icon" aria-hidden="true">👨‍👩‍👧</span>
+        Portal Santri/Wali
+        <span class="nav-item-tag">Fase 4</span>
+      </a>
+
+      <div class="nav-section-title">Laporan</div>
+
+      <!-- Modul 10: Laporan & Analytics -->
+      <a href="#" class="nav-item" aria-label="Laporan dan Grafik Analytics (belum tersedia, Fase 5)">
+        <span class="nav-item-icon" aria-hidden="true">📈</span>
+        Laporan & Analytics
+        <span class="nav-item-tag">Fase 5</span>
+      </a>
+
+    </nav>
+
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer">
+      <a href="/auth/logout" class="nav-item" style="color:rgba(255,255,255,0.5);" aria-label="Keluar dari sistem">
+        <span class="nav-item-icon" aria-hidden="true">🚪</span>
+        Keluar
+      </a>
+      <div style="font-size:0.65rem;color:rgba(255,255,255,0.25);padding:0.5rem 0.5rem 0;text-align:center;">
+        SPK Health v1.0 — Fase 1
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══════════════════════════════════════════════════════
+       MAIN CONTENT
+  ═══════════════════════════════════════════════════════ -->
+  <div class="main-content">
+
+    <!-- Top Bar -->
+    <header class="topbar" role="banner">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Buka/tutup sidebar" aria-expanded="false" aria-controls="sidebar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div>
+          <div class="topbar-title">Dashboard Admin</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <!-- Demo Banner -->
+        <div class="demo-banner" role="status" aria-label="Mode data demo">
+          <span aria-hidden="true">⚠️</span>
+          DATA DEMO
+        </div>
+        <!-- Notification -->
+        <button class="topbar-notification" aria-label="Notifikasi (3 notifikasi baru)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notif-dot" aria-hidden="true"></span>
+        </button>
+        <!-- Avatar -->
+        <div class="topbar-avatar" role="img" aria-label="Profil pengguna: Admin Demo">AD</div>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="page-content" id="main-content" aria-label="Konten dashboard">
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Selamat Datang, Admin 👋</h1>
+          <p class="page-subtitle">Sabtu, 31 Oktober 2026 &nbsp;·&nbsp; Poskestren Al-Bahjah Cabang Bogor</p>
+        </div>
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+          <button class="btn btn-outline btn-sm" aria-label="Perbarui data dashboard">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Refresh
+          </button>
+          <button class="btn btn-primary btn-sm" aria-label="Tambah pasien baru">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Pasien Baru
+          </button>
+        </div>
+      </div>
+
+      <!-- ─── Stats Grid ───────────────────────────────────── -->
+      <div class="stats-grid" role="region" aria-label="Statistik hari ini">
+
+        <div class="stat-widget" tabindex="0">
+          <div class="stat-widget-icon icon-green" aria-hidden="true">🏥</div>
+          <div>
+            <div class="stat-widget-label">Total Kunjungan Hari Ini</div>
+            <div class="stat-widget-value" aria-label="24 kunjungan">24</div>
+            <div class="stat-widget-change change-up">↑ +6 dari kemarin</div>
+          </div>
+        </div>
+
+        <div class="stat-widget" tabindex="0">
+          <div class="stat-widget-icon icon-red" aria-hidden="true">🚨</div>
+          <div>
+            <div class="stat-widget-label">Antrean Darurat</div>
+            <div class="stat-widget-value" aria-label="5 antrean darurat" style="color:var(--emergency);">5</div>
+            <div class="stat-widget-change change-down">Triase Prioritas Tinggi</div>
+          </div>
+        </div>
+
+        <div class="stat-widget" tabindex="0">
+          <div class="stat-widget-icon icon-blue" aria-hidden="true">🛏️</div>
+          <div>
+            <div class="stat-widget-label">Santri Rawat Inap Aktif</div>
+            <div class="stat-widget-value" aria-label="8 santri rawat inap">8</div>
+            <div class="stat-widget-change change-up">Kapasitas: 15 tempat</div>
+          </div>
+        </div>
+
+        <div class="stat-widget" tabindex="0">
+          <div class="stat-widget-icon icon-yellow" aria-hidden="true">⚠️</div>
+          <div>
+            <div class="stat-widget-label">Obat Stok Kritis</div>
+            <div class="stat-widget-value" aria-label="3 obat stok kritis" style="color:var(--warning);">3</div>
+            <div class="stat-widget-change change-down">Perlu segera restok</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ─── Main Grid: Chart + Triase Table ─────────────── -->
+      <div class="dashboard-grid">
+
+        <!-- Chart: Kunjungan 7 Hari -->
+        <div class="widget" role="region" aria-labelledby="chart-title">
+          <div class="widget-header">
+            <div>
+              <div class="widget-title" id="chart-title">📊 Tren Kunjungan 7 Hari Terakhir</div>
+              <div style="font-size:0.75rem;color:var(--muted);">Data dummy — Fase 1</div>
+            </div>
+            <span class="badge badge-neutral">Demo</span>
+          </div>
+          <div class="chart-area" role="img" aria-label="Grafik batang tren kunjungan 7 hari terakhir">
+            <!-- Bar Chart Visual (CSS) -->
+            <div class="chart-bar-group">
+              <div class="chart-bar chart-bar-green" style="height:80px;" title="Sen: 18 kunjungan"></div>
+              <div class="chart-label">Sen</div>
+            </div>
+            <div class="chart-bar-group">
+              <div class="chart-bar chart-bar-green" style="height:110px;" title="Sel: 22 kunjungan"></div>
+              <div class="chart-label">Sel</div>
+            </div>
+            <div class="chart-bar-group">
+              <div class="chart-bar chart-bar-red" style="height:145px;" title="Rab: 30 kunjungan"></div>
+              <div class="chart-label">Rab</div>
+            </div>
+            <div class="chart-bar-group">
+              <div class="chart-bar chart-bar-green" style="height:95px;" title="Kam: 20 kunjungan"></div>
+              <div class="chart-label">Kam</div>
+            </div>
+            <div class="chart-bar-group">
+              <div class="chart-bar chart-bar-green" style="height:120px;" title="Jum: 25 kunjungan"></div>
+              <div class="chart-label">Jum</div>
+            </div>
+            <div class="chart-bar-group">
+              <div class="chart-bar chart-bar-green" style="height:75px;" title="Sab: 16 kunjungan"></div>
+              <div class="chart-label">Sab</div>
+            </div>
+            <div class="chart-bar-group">
+              <div class="chart-bar chart-bar-green" style="height:115px;" title="Hari ini: 24 kunjungan"></div>
+              <div class="chart-label">Hari ini</div>
+            </div>
+          </div>
+          <div class="chart-legend">
+            <div class="legend-item">
+              <div class="legend-dot" style="background:var(--primary);" aria-hidden="true"></div>
+              <span>Kunjungan Normal</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:var(--emergency);" aria-hidden="true"></div>
+              <span>Kunjungan Tinggi</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stock Alert Panel -->
+        <div class="widget" role="region" aria-labelledby="stock-alert-title">
+          <div class="widget-header">
+            <div class="widget-title" id="stock-alert-title">⚠️ Peringatan Stok Obat</div>
+            <a href="#" class="btn btn-ghost btn-sm" aria-label="Lihat semua stok obat">Lihat Semua</a>
+          </div>
+          <div class="widget-body">
+            <div class="stock-alert-item" role="listitem">
+              <span aria-hidden="true" style="font-size:1.25rem;">💊</span>
+              <div class="stock-bar-container">
+                <div class="stock-bar-label">
+                  <span>Paracetamol 500mg</span>
+                  <span style="color:var(--emergency);font-weight:700;">8 tablet</span>
+                </div>
+                <div class="stock-bar-track" role="progressbar" aria-valuenow="8" aria-valuemin="0" aria-valuemax="100" aria-label="Stok kritis: 8 dari 100">
+                  <div class="stock-bar-fill stock-critical" style="width:8%;"></div>
+                </div>
+              </div>
+              <span class="badge badge-emergency">Kritis</span>
+            </div>
+            <div class="stock-alert-item" role="listitem">
+              <span aria-hidden="true" style="font-size:1.25rem;">💉</span>
+              <div class="stock-bar-container">
+                <div class="stock-bar-label">
+                  <span>Amoxicillin 500mg</span>
+                  <span style="color:var(--warning);font-weight:700;">25 kapsul</span>
+                </div>
+                <div class="stock-bar-track" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" aria-label="Stok rendah: 25 dari 100">
+                  <div class="stock-bar-fill stock-warning" style="width:25%;"></div>
+                </div>
+              </div>
+              <span class="badge badge-warning">Rendah</span>
+            </div>
+            <div class="stock-alert-item" role="listitem">
+              <span aria-hidden="true" style="font-size:1.25rem;">🩹</span>
+              <div class="stock-bar-container">
+                <div class="stock-bar-label">
+                  <span>ORS / Oralit</span>
+                  <span style="color:var(--emergency);font-weight:700;">5 sachet</span>
+                </div>
+                <div class="stock-bar-track" role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="100" aria-label="Stok kritis: 5 dari 100">
+                  <div class="stock-bar-fill stock-critical" style="width:5%;"></div>
+                </div>
+              </div>
+              <span class="badge badge-emergency">Kritis</span>
+            </div>
+            <div class="stock-alert-item" role="listitem">
+              <span aria-hidden="true" style="font-size:1.25rem;">💊</span>
+              <div class="stock-bar-container">
+                <div class="stock-bar-label">
+                  <span>Antasida Tablet</span>
+                  <span style="color:var(--primary);font-weight:700;">78 tablet</span>
+                </div>
+                <div class="stock-bar-track" role="progressbar" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100" aria-label="Stok cukup: 78 dari 100">
+                  <div class="stock-bar-fill stock-ok" style="width:78%;"></div>
+                </div>
+              </div>
+              <span class="badge badge-success">Cukup</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Antrean Triase Table ──────────────────────────── -->
+      <div class="widget" style="margin-bottom:1.25rem;" role="region" aria-labelledby="triase-table-title">
+        <div class="widget-header">
+          <div>
+            <div class="widget-title" id="triase-table-title">🚑 Antrean Triase Hari Ini</div>
+            <div style="font-size:0.75rem;color:var(--muted);">Data fiktif — urutan berdasarkan skor SAW tertinggi</div>
+          </div>
+          <div style="display:flex;gap:0.5rem;align-items:center;">
+            <span class="badge badge-emergency" aria-label="5 antrean darurat">5 Darurat</span>
+            <a href="#" class="btn btn-primary btn-sm" aria-label="Lihat papan triase lengkap">Papan Triase</a>
+          </div>
+        </div>
+        <div class="widget-body-p0" style="overflow-x:auto;">
+          <table class="data-table" aria-label="Tabel antrean triase santri">
+            <thead>
+              <tr>
+                <th scope="col">No</th>
+                <th scope="col">Nama Santri</th>
+                <th scope="col">NIS</th>
+                <th scope="col">Keluhan</th>
+                <th scope="col">TTV</th>
+                <th scope="col">Skor SAW</th>
+                <th scope="col">Prioritas</th>
+                <th scope="col">Status</th>
+                <th scope="col">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="priority-high">
+                <td>1</td>
+                <td><strong>Ahmad Ridwan</strong></td>
+                <td>2024001</td>
+                <td>Demam Tinggi, Sesak Napas</td>
+                <td>38.9°C · SpO2 94%</td>
+                <td><strong style="color:var(--emergency);">0.89</strong></td>
+                <td><span class="badge badge-emergency">🔴 Darurat - Merah</span></td>
+                <td><span class="badge badge-warning">Menunggu</span></td>
+                <td><button class="btn btn-primary btn-sm" aria-label="Periksa Ahmad Ridwan">Periksa</button></td>
+              </tr>
+              <tr class="priority-high">
+                <td>2</td>
+                <td><strong>Muhammad Fajar</strong></td>
+                <td>2024017</td>
+                <td>Nyeri Dada, Pusing Berat</td>
+                <td>Nadi 110x/mnt · TD 140/90</td>
+                <td><strong style="color:var(--emergency);">0.82</strong></td>
+                <td><span class="badge badge-emergency">🔴 Darurat - Merah</span></td>
+                <td><span class="badge badge-warning">Menunggu</span></td>
+                <td><button class="btn btn-primary btn-sm" aria-label="Periksa Muhammad Fajar">Periksa</button></td>
+              </tr>
+              <tr class="priority-high">
+                <td>3</td>
+                <td><strong>Bilal Syahputra</strong></td>
+                <td>2024032</td>
+                <td>Diare Berat, Lemas</td>
+                <td>38.5°C · Nadi 95x/mnt</td>
+                <td><strong style="color:var(--emergency);">0.76</strong></td>
+                <td><span class="badge badge-emergency">🔴 Darurat - Merah</span></td>
+                <td><span class="badge badge-info">Diperiksa</span></td>
+                <td><button class="btn btn-ghost btn-sm" aria-label="Lihat detail Bilal Syahputra">Detail</button></td>
+              </tr>
+              <tr class="priority-medium">
+                <td>4</td>
+                <td>Hafiz Maulana</td>
+                <td>2024045</td>
+                <td>Batuk & Pilek, Demam Ringan</td>
+                <td>37.8°C · SpO2 98%</td>
+                <td><strong style="color:var(--warning);">0.58</strong></td>
+                <td><span class="badge badge-warning">🟡 Sedang - Kuning</span></td>
+                <td><span class="badge badge-warning">Menunggu</span></td>
+                <td><button class="btn btn-primary btn-sm" aria-label="Periksa Hafiz Maulana">Periksa</button></td>
+              </tr>
+              <tr class="priority-medium">
+                <td>5</td>
+                <td>Rizki Ananda</td>
+                <td>2024058</td>
+                <td>Sakit Kepala, Mual</td>
+                <td>36.9°C · TD 120/80</td>
+                <td><strong style="color:var(--warning);">0.52</strong></td>
+                <td><span class="badge badge-warning">🟡 Sedang - Kuning</span></td>
+                <td><span class="badge badge-warning">Menunggu</span></td>
+                <td><button class="btn btn-primary btn-sm" aria-label="Periksa Rizki Ananda">Periksa</button></td>
+              </tr>
+              <tr class="priority-low">
+                <td>6</td>
+                <td>Umar Hakim</td>
+                <td>2024071</td>
+                <td>Luka Lecet Ringan</td>
+                <td>36.5°C · Normal</td>
+                <td><strong style="color:var(--primary);">0.31</strong></td>
+                <td><span class="badge badge-success">🟢 Ringan - Hijau</span></td>
+                <td><span class="badge badge-success">Selesai</span></td>
+                <td><button class="btn btn-ghost btn-sm" aria-label="Lihat detail Umar Hakim">Detail</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── Bottom Row: Rawat Inap + Aktivitas ───────────── -->
+      <div class="dashboard-grid-3">
+
+        <!-- Rawat Inap -->
+        <div class="widget" role="region" aria-labelledby="rawat-inap-title">
+          <div class="widget-header">
+            <div class="widget-title" id="rawat-inap-title">🛏️ Rawat Inap Aktif</div>
+            <span class="badge badge-info">8 / 15</span>
+          </div>
+          <div class="widget-body">
+            <div style="display:flex;flex-direction:column;gap:0.75rem;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                  <div style="font-size:0.875rem;font-weight:600;color:var(--text);">Ahmad Ridwan</div>
+                  <div style="font-size:0.75rem;color:var(--muted);">Kamar A-1 · Hari ke-2</div>
+                </div>
+                <span class="badge badge-emergency">Kritis</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                  <div style="font-size:0.875rem;font-weight:600;color:var(--text);">Bayu Setiawan</div>
+                  <div style="font-size:0.75rem;color:var(--muted);">Kamar A-3 · Hari ke-1</div>
+                </div>
+                <span class="badge badge-warning">Sedang</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                  <div style="font-size:0.875rem;font-weight:600;color:var(--text);">Dafa Pratama</div>
+                  <div style="font-size:0.75rem;color:var(--muted);">Kamar B-2 · Hari ke-3</div>
+                </div>
+                <span class="badge badge-success">Membaik</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                  <div style="font-size:0.875rem;font-weight:600;color:var(--text);">Irfan Ghifari</div>
+                  <div style="font-size:0.75rem;color:var(--muted);">Kamar B-4 · Hari ke-1</div>
+                </div>
+                <span class="badge badge-warning">Sedang</span>
+              </div>
+            </div>
+            <a href="#" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;margin-top:1rem;" aria-label="Lihat semua pasien rawat inap">
+              Lihat Semua (8)
+            </a>
+          </div>
+        </div>
+
+        <!-- Distribusi Penyakit -->
+        <div class="widget" role="region" aria-labelledby="distribusi-title">
+          <div class="widget-header">
+            <div class="widget-title" id="distribusi-title">🦠 Distribusi Penyakit</div>
+          </div>
+          <div class="widget-body">
+            <div style="display:flex;flex-direction:column;gap:0.875rem;">
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:0.8125rem;margin-bottom:0.3rem;">
+                  <span style="color:var(--text);font-weight:500;">ISPA / Flu</span>
+                  <span style="color:var(--muted);">8 kasus (33%)</span>
+                </div>
+                <div class="stock-bar-track">
+                  <div class="stock-bar-fill" style="width:33%;background:var(--primary);"></div>
+                </div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:0.8125rem;margin-bottom:0.3rem;">
+                  <span style="color:var(--text);font-weight:500;">Maag / Gastritis</span>
+                  <span style="color:var(--muted);">5 kasus (21%)</span>
+                </div>
+                <div class="stock-bar-track">
+                  <div class="stock-bar-fill" style="width:21%;background:#60A5FA;"></div>
+                </div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:0.8125rem;margin-bottom:0.3rem;">
+                  <span style="color:var(--text);font-weight:500;">Diare</span>
+                  <span style="color:var(--muted);">4 kasus (17%)</span>
+                </div>
+                <div class="stock-bar-track">
+                  <div class="stock-bar-fill" style="width:17%;background:var(--warning);"></div>
+                </div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:0.8125rem;margin-bottom:0.3rem;">
+                  <span style="color:var(--text);font-weight:500;">Demam Tifoid</span>
+                  <span style="color:var(--muted);">3 kasus (13%)</span>
+                </div>
+                <div class="stock-bar-track">
+                  <div class="stock-bar-fill" style="width:13%;background:var(--emergency);"></div>
+                </div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:0.8125rem;margin-bottom:0.3rem;">
+                  <span style="color:var(--text);font-weight:500;">Lainnya</span>
+                  <span style="color:var(--muted);">4 kasus (16%)</span>
+                </div>
+                <div class="stock-bar-track">
+                  <div class="stock-bar-fill" style="width:16%;background:#A78BFA;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aktivitas Terbaru -->
+        <div class="widget" role="region" aria-labelledby="aktivitas-title">
+          <div class="widget-header">
+            <div class="widget-title" id="aktivitas-title">🕐 Aktivitas Terbaru</div>
+          </div>
+          <div class="widget-body">
+            <div style="display:flex;flex-direction:column;gap:0.875rem;">
+              <div style="display:flex;gap:0.75rem;align-items:flex-start;">
+                <div style="width:32px;height:32px;background:var(--emergency-bg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.875rem;flex-shrink:0;" aria-hidden="true">🚨</div>
+                <div>
+                  <div style="font-size:0.8125rem;font-weight:600;color:var(--text);">Triase Darurat — Ahmad R.</div>
+                  <div style="font-size:0.75rem;color:var(--muted);">5 menit lalu · Skor SAW: 0.89</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:0.75rem;align-items:flex-start;">
+                <div style="width:32px;height:32px;background:var(--success-bg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.875rem;flex-shrink:0;" aria-hidden="true">✅</div>
+                <div>
+                  <div style="font-size:0.8125rem;font-weight:600;color:var(--text);">Pemeriksaan Selesai — Umar H.</div>
+                  <div style="font-size:0.75rem;color:var(--muted);">12 menit lalu · Prioritas Ringan</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:0.75rem;align-items:flex-start;">
+                <div style="width:32px;height:32px;background:var(--warning-bg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.875rem;flex-shrink:0;" aria-hidden="true">💊</div>
+                <div>
+                  <div style="font-size:0.8125rem;font-weight:600;color:var(--text);">Resep Dikirim ke Farmasi</div>
+                  <div style="font-size:0.75rem;color:var(--muted);">18 menit lalu · 2 resep</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:0.75rem;align-items:flex-start;">
+                <div style="width:32px;height:32px;background:#EFF6FF;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.875rem;flex-shrink:0;" aria-hidden="true">📝</div>
+                <div>
+                  <div style="font-size:0.8125rem;font-weight:600;color:var(--text);">Rekam Medis Diperbarui</div>
+                  <div style="font-size:0.75rem;color:var(--muted);">25 menit lalu · Bayu S.</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:0.75rem;align-items:flex-start;">
+                <div style="width:32px;height:32px;background:var(--emergency-bg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.875rem;flex-shrink:0;" aria-hidden="true">⚠️</div>
+                <div>
+                  <div style="font-size:0.8125rem;font-weight:600;color:var(--text);">Peringatan Stok: Paracetamol</div>
+                  <div style="font-size:0.75rem;color:var(--muted);">1 jam lalu · Sisa 8 tablet</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="false"></div>
+
+<script src="/js/app.js"></script>
+<script>
+  // ─── Sidebar Toggle (Mobile) ──────────────────────────────
+  const sidebarToggle  = document.getElementById('sidebarToggle');
+  const sidebar        = document.getElementById('sidebar');
+  const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+  function openSidebar() {
+    sidebar.classList.add('open');
+    sidebarOverlay.classList.add('active');
+    sidebarToggle.setAttribute('aria-expanded', 'true');
+    sidebarOverlay.setAttribute('aria-hidden', 'false');
+  }
+  function closeSidebar() {
+    sidebar.classList.remove('open');
+    sidebarOverlay.classList.remove('active');
+    sidebarToggle.setAttribute('aria-expanded', 'false');
+    sidebarOverlay.setAttribute('aria-hidden', 'true');
+  }
+
+  sidebarToggle.addEventListener('click', () => {
+    sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+  });
+  sidebarOverlay.addEventListener('click', closeSidebar);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeSidebar();
+  });
+
+  // ─── Placeholder nav items ────────────────────────────────
+  document.querySelectorAll('.nav-item[href="#"]').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      const label = item.querySelector('.nav-item-tag')?.textContent;
+      showToast('info', `Fitur ini akan tersedia pada ${label || 'fase berikutnya'}.`);
+    });
+  });
+
+  // ─── Toast Function ───────────────────────────────────────
+  function showToast(type, message) {
+    const container = document.getElementById('toastContainer');
+    const icons = { info: 'ℹ️', success: '✅', error: '❌', warning: '⚠️' };
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type === 'info' ? '' : type}`;
+    toast.setAttribute('role', 'status');
+    toast.innerHTML = `<span aria-hidden="true">${icons[type] || 'ℹ️'}</span><span style="flex:1;">${message}</span>
+      <button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:0 0 0 0.5rem;font-size:1rem;" aria-label="Tutup notifikasi">×</button>`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 4000);
+  }
+</script>
+</body>
+</html>

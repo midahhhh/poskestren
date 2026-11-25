@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — SPK Health Poskestren Al-Bahjah Bogor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+
+<div class="login-page">
+  <div class="login-wrapper">
+
+    <!-- ══════════════════════════════
+         LEFT PANEL (Branding)
+    ═══════════════════════════════ -->
+    <div class="login-panel" role="complementary" aria-label="Informasi sistem">
+      <!-- Brand -->
+      <div>
+        <div class="login-panel-logo">
+          <div class="login-logo-icon" aria-hidden="true">🏥</div>
+          <div>
+            <div class="login-panel-title">SPK Health</div>
+            <div class="login-panel-sub">Poskestren Al-Bahjah Bogor</div>
+          </div>
+        </div>
+
+        <!-- Features -->
+        <div class="login-features" aria-label="Fitur utama sistem">
+          <div class="login-feature">
+            <div class="login-feature-icon" aria-hidden="true">🚑</div>
+            <div>
+              <h6>Triase Cerdas</h6>
+              <p>Prioritas penanganan otomatis berbasis skor SAW klinis.</p>
+            </div>
+          </div>
+          <div class="login-feature">
+            <div class="login-feature-icon" aria-hidden="true">📊</div>
+            <div>
+              <h6>Dashboard Real-time</h6>
+              <p>Pantau antrean, stok obat, dan statistik kunjungan.</p>
+            </div>
+          </div>
+          <div class="login-feature">
+            <div class="login-feature-icon" aria-hidden="true">🔐</div>
+            <div>
+              <h6>Multi-Role Aman</h6>
+              <p>Akses berbasis peran untuk keamanan data santri.</p>
+            </div>
+          </div>
+          <div class="login-feature">
+            <div class="login-feature-icon" aria-hidden="true">📱</div>
+            <div>
+              <h6>Responsif</h6>
+              <p>Dapat diakses dari desktop, tablet, maupun ponsel.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="login-panel-footer">
+        © 2024 Poskestren Al-Bahjah Cabang Bogor &nbsp;·&nbsp; v1.0
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         RIGHT PANEL (Form)
+    ═══════════════════════════════ -->
+    <div class="login-form-area">
+      <div class="login-form-header">
+        <h2>Selamat Datang 👋</h2>
+        <p>Masuk ke Sistem Informasi Kesehatan Pesantren Al-Bahjah</p>
+      </div>
+
+      <!-- Demo Notice -->
+      <div class="demo-banner" role="status" aria-live="polite" style="margin-bottom:1.5rem;">
+        <span aria-hidden="true">⚠️</span>
+        <span><strong>Mode Demo — Fase 1.</strong> Login belum terhubung ke database.</span>
+      </div>
+
+      <!-- Alert Area -->
+      <div id="loginAlert" class="hidden" role="alert" aria-live="assertive"></div>
+
+      <!-- Role Tabs -->
+      <div class="role-tabs" role="tablist" aria-label="Pilih peran pengguna">
+        <button
+          class="role-tab active"
+          role="tab"
+          id="tab-admin"
+          aria-selected="true"
+          aria-controls="form-main"
+          data-role="admin"
+          type="button"
+        >
+          <span class="role-tab-icon" aria-hidden="true">👨‍⚕️</span>
+          <span class="role-tab-label">Admin</span>
+        </button>
+        <button
+          class="role-tab"
+          role="tab"
+          id="tab-nakes"
+          aria-selected="false"
+          aria-controls="form-main"
+          data-role="nakes"
+          type="button"
+        >
+          <span class="role-tab-icon" aria-hidden="true">🩺</span>
+          <span class="role-tab-label">Nakes</span>
+        </button>
+        <button
+          class="role-tab"
+          role="tab"
+          id="tab-farmasi"
+          aria-selected="false"
+          aria-controls="form-main"
+          data-role="farmasi"
+          type="button"
+        >
+          <span class="role-tab-icon" aria-hidden="true">💊</span>
+          <span class="role-tab-label">Farmasi</span>
+        </button>
+        <button
+          class="role-tab"
+          role="tab"
+          id="tab-santri"
+          aria-selected="false"
+          aria-controls="form-main"
+          data-role="santri"
+          type="button"
+        >
+          <span class="role-tab-icon" aria-hidden="true">🎓</span>
+          <span class="role-tab-label">Santri</span>
+        </button>
+        <button
+          class="role-tab"
+          role="tab"
+          id="tab-wali"
+          aria-selected="false"
+          aria-controls="form-main"
+          data-role="wali"
+          type="button"
+        >
+          <span class="role-tab-icon" aria-hidden="true">👨‍👩‍👧</span>
+          <span class="role-tab-label">Wali</span>
+        </button>
+      </div>
+
+      <!-- Credential Hint -->
+      <div class="cred-hint" id="credHint" aria-live="polite">
+        <strong>🔑 Kredensial Demo:</strong>
+        <span id="credText">Username: <code>admin</code> &nbsp;|&nbsp; Password: <code>demo123</code></span>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" novalidate aria-label="Formulir login">
+        <input type="hidden" id="roleInput" name="role" value="admin" />
+
+        <div class="form-group">
+          <label class="form-label" for="username">
+            Username / NIS
+            <span aria-hidden="true" style="color:var(--emergency)"> *</span>
+          </label>
+          <div class="input-wrapper">
+            <span class="input-icon" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </span>
+            <input
+              type="text"
+              class="form-input"
+              id="username"
+              name="username"
+              placeholder="Masukkan username atau NIS"
+              autocomplete="username"
+              aria-required="true"
+              aria-describedby="username-error"
+            />
+          </div>
+          <div id="username-error" class="hidden" style="font-size:0.8rem;color:var(--emergency);margin-top:0.35rem;" role="alert"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">
+            Kata Sandi
+            <span aria-hidden="true" style="color:var(--emergency)"> *</span>
+          </label>
+          <div class="input-wrapper">
+            <span class="input-icon" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </span>
+            <input
+              type="password"
+              class="form-input"
+              id="password"
+              name="password"
+              placeholder="Masukkan kata sandi"
+              autocomplete="current-password"
+              aria-required="true"
+              aria-describedby="password-error"
+            />
+            <button
+              type="button"
+              class="input-action"
+              id="togglePassword"
+              aria-label="Tampilkan kata sandi"
+              aria-pressed="false"
+            >
+              <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg id="eyeOffIcon" class="hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </button>
+          </div>
+          <div id="password-error" class="hidden" style="font-size:0.8rem;color:var(--emergency);margin-top:0.35rem;" role="alert"></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="loginBtn" style="width:100%;justify-content:center;margin-top:0.5rem;" aria-label="Masuk ke sistem">
+          <span id="btnText">Masuk ke Sistem</span>
+          <span id="btnSpinner" class="spinner hidden" aria-hidden="true"></span>
+        </button>
+      </form>
+
+      <!-- Back to Landing -->
+      <div style="text-align:center;margin-top:1.5rem;">
+        <a href="/" style="font-size:0.875rem;color:var(--muted);display:inline-flex;align-items:center;gap:0.4rem;" aria-label="Kembali ke halaman utama">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Kembali ke Halaman Utama
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/js/app.js"></script>
+<script>
+  // ─── Role & Credentials ───────────────────────────────────
+  const credentials = {
+    admin:   { username: 'admin',   password: 'demo123', hint: 'Username: <code>admin</code> &nbsp;|&nbsp; Password: <code>demo123</code>' },
+    nakes:   { username: 'nakes',   password: 'demo123', hint: 'Username: <code>nakes</code> &nbsp;|&nbsp; Password: <code>demo123</code>' },
+    farmasi: { username: 'farmasi', password: 'demo123', hint: 'Username: <code>farmasi</code> &nbsp;|&nbsp; Password: <code>demo123</code>' },
+    santri:  { username: 'santri',  password: 'demo123', hint: 'Username: <code>santri</code> (NIS) &nbsp;|&nbsp; Password: <code>demo123</code>' },
+    wali:    { username: 'wali',    password: 'demo123', hint: 'Username: <code>wali</code> &nbsp;|&nbsp; Password: <code>demo123</code>' },
+  };
+
+  const roleInput    = document.getElementById('roleInput');
+  const credText     = document.getElementById('credText');
+  const usernameInput = document.getElementById('username');
+  const passwordInput = document.getElementById('password');
+
+  document.querySelectorAll('.role-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.role-tab').forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+
+      const role = tab.dataset.role;
+      roleInput.value = role;
+      credText.innerHTML = credentials[role].hint;
+
+      // Auto-fill for demo convenience
+      usernameInput.value = credentials[role].username;
+      passwordInput.value = credentials[role].password;
+
+      clearErrors();
+    });
+  });
+
+  // ─── Password Toggle ──────────────────────────────────────
+  const toggleBtn  = document.getElementById('togglePassword');
+  const eyeIcon    = document.getElementById('eyeIcon');
+  const eyeOffIcon = document.getElementById('eyeOffIcon');
+
+  toggleBtn.addEventListener('click', () => {
+    const isPassword = passwordInput.type === 'password';
+    passwordInput.type = isPassword ? 'text' : 'password';
+    eyeIcon.classList.toggle('hidden', isPassword);
+    eyeOffIcon.classList.toggle('hidden', !isPassword);
+    toggleBtn.setAttribute('aria-pressed', String(isPassword));
+    toggleBtn.setAttribute('aria-label', isPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi');
+  });
+
+  // ─── Validation Helpers ───────────────────────────────────
+  function showFieldError(fieldId, errorId, msg) {
+    const field = document.getElementById(fieldId);
+    const errEl = document.getElementById(errorId);
+    field.style.borderColor = 'var(--emergency)';
+    errEl.textContent = msg;
+    errEl.classList.remove('hidden');
+  }
+  function clearFieldError(fieldId, errorId) {
+    const field = document.getElementById(fieldId);
+    const errEl = document.getElementById(errorId);
+    field.style.borderColor = '';
+    errEl.classList.add('hidden');
+  }
+  function clearErrors() {
+    clearFieldError('username', 'username-error');
+    clearFieldError('password', 'password-error');
+    const alert = document.getElementById('loginAlert');
+    alert.classList.add('hidden');
+    alert.innerHTML = '';
+  }
+
+  function showAlert(type, msg) {
+    const alert = document.getElementById('loginAlert');
+    const icons = { error: '❌', success: '✅', warning: '⚠️' };
+    alert.className = `alert alert-${type}`;
+    alert.innerHTML = `<span aria-hidden="true">${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+    alert.classList.remove('hidden');
+    alert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // ─── Form Submit ──────────────────────────────────────────
+  const loginForm = document.getElementById('loginForm');
+  const loginBtn  = document.getElementById('loginBtn');
+  const btnText   = document.getElementById('btnText');
+  const btnSpinner = document.getElementById('btnSpinner');
+
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearErrors();
+
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value;
+    const role     = roleInput.value;
+
+    // Client-side validation
+    let hasError = false;
+    if (!username) {
+      showFieldError('username', 'username-error', 'Username / NIS wajib diisi.');
+      hasError = true;
+    }
+    if (!password) {
+      showFieldError('password', 'password-error', 'Kata sandi wajib diisi.');
+      hasError = true;
+    }
+    if (hasError) return;
+
+    // Loading state
+    loginBtn.disabled = true;
+    btnText.textContent = 'Memproses...';
+    btnSpinner.classList.remove('hidden');
+
+    try {
+      const resp = await fetch('/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password, role }),
+      });
+      const data = await resp.json();
+
+      if (data.success) {
+        showAlert('success', `Login berhasil! Mengalihkan ke dashboard ${role}...`);
+        btnText.textContent = 'Berhasil!';
+        setTimeout(() => {
+          window.location.href = data.redirect;
+        }, 800);
+      } else {
+        showAlert('error', data.message || 'Login gagal. Periksa kembali username dan password.');
+        loginBtn.disabled = false;
+        btnText.textContent = 'Masuk ke Sistem';
+        btnSpinner.classList.add('hidden');
+      }
+    } catch (err) {
+      showAlert('error', 'Terjadi kesalahan koneksi. Coba lagi.');
+      loginBtn.disabled = false;
+      btnText.textContent = 'Masuk ke Sistem';
+      btnSpinner.classList.add('hidden');
+    }
+  });
+
+  // Inline real-time validation
+  usernameInput.addEventListener('input', () => { if (usernameInput.value.trim()) clearFieldError('username', 'username-error'); });
+  passwordInput.addEventListener('input', () => { if (passwordInput.value) clearFieldError('password', 'password-error'); });
+
+  // Auto-fill initial
+  usernameInput.value = credentials['admin'].username;
+  passwordInput.value = credentials['admin'].password;
+</script>
+</body>
+</html>

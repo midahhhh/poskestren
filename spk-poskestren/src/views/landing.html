@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SPK Health & Triase — Poskestren Al-Bahjah Bogor</title>
+  <meta name="description" content="Sistem Pendukung Keputusan Penentuan Prioritas Penanganan Santri Sakit menggunakan metode SAW pada Poskestren Al-Bahjah Cabang Bogor." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════
+       NAVBAR
+  ════════════════════════════════════════════════════════ -->
+  <nav class="navbar" role="navigation" aria-label="Navigasi utama">
+    <div class="navbar-inner">
+      <!-- Brand -->
+      <a href="/" class="navbar-brand" aria-label="SPK Poskestren Al-Bahjah Bogor - Beranda">
+        <div class="navbar-logo" aria-hidden="true">🏥</div>
+        <div>
+          <div class="navbar-title">SPK Health</div>
+          <div class="navbar-subtitle">Poskestren Al-Bahjah Bogor</div>
+        </div>
+      </a>
+
+      <!-- Nav Links -->
+      <nav class="navbar-nav" aria-label="Tautan navigasi">
+        <a href="#fitur"   class="nav-link">Fitur</a>
+        <a href="#alur"    class="nav-link">Alur Layanan</a>
+        <a href="#tentang" class="nav-link">Tentang</a>
+      </nav>
+
+      <!-- Actions -->
+      <div class="navbar-actions">
+        <a href="/auth/login" class="btn btn-accent btn-sm">
+          <span aria-hidden="true">🔐</span> Masuk ke Sistem
+        </a>
+      </div>
+
+      <!-- Mobile toggle -->
+      <button class="menu-toggle" id="menuToggle" aria-label="Buka menu" aria-expanded="false" aria-controls="mobileMenu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="hidden" style="background:rgba(11,61,46,0.98);border-top:1px solid rgba(255,255,255,0.08);padding:1rem 1.5rem;" role="menu">
+      <a href="#fitur"   class="nav-link" role="menuitem" style="display:block;padding:0.6rem 0;">Fitur</a>
+      <a href="#alur"    class="nav-link" role="menuitem" style="display:block;padding:0.6rem 0;">Alur Layanan</a>
+      <a href="#tentang" class="nav-link" role="menuitem" style="display:block;padding:0.6rem 0;">Tentang</a>
+      <a href="/auth/login" class="btn btn-accent btn-sm" role="menuitem" style="margin-top:0.75rem;width:100%;justify-content:center;">🔐 Masuk ke Sistem</a>
+    </div>
+  </nav>
+
+  <main id="main-content">
+
+  <!-- ═══════════════════════════════════════════════════════
+       HERO
+  ════════════════════════════════════════════════════════ -->
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="hero-content">
+      <!-- Left: Copy -->
+      <div class="hero-left">
+        <div class="hero-badge" aria-label="Metode SAW">
+          <span aria-hidden="true">⚕️</span>
+          Metode Simple Additive Weighting (SAW)
+        </div>
+        <h1 class="hero-title" id="hero-heading">
+          Sistem Pendukung Keputusan<br/>
+          <span>Triase & Prioritas</span><br/>
+          Kesehatan Santri
+        </h1>
+        <p class="hero-desc">
+          Platform digital untuk membantu petugas Poskestren Al-Bahjah Cabang Bogor dalam menentukan prioritas penanganan santri sakit secara cepat, objektif, dan berbasis data klinis.
+        </p>
+        <div class="hero-actions">
+          <a href="/auth/login" class="btn btn-accent btn-lg">
+            <span aria-hidden="true">🚀</span> Mulai Gunakan Sistem
+          </a>
+          <a href="#fitur" class="btn btn-outline btn-lg" style="color:#fff;border-color:rgba(255,255,255,0.4);">
+            <span aria-hidden="true">📋</span> Lihat Fitur
+          </a>
+        </div>
+      </div>
+
+      <!-- Right: Visual Cards -->
+      <div class="hero-visual" aria-hidden="true">
+        <div class="hero-card">
+          <div class="hero-card-icon" style="background:rgba(244,197,66,0.15);">🚨</div>
+          <div>
+            <div class="hero-card-title">Triase Darurat</div>
+            <div class="hero-card-desc">Santri Ahmad R. — Prioritas Tinggi</div>
+          </div>
+          <span class="badge badge-emergency" style="margin-left:auto;">Darurat</span>
+        </div>
+        <div class="hero-card">
+          <div class="hero-card-icon" style="background:rgba(245,158,11,0.15);">🩺</div>
+          <div>
+            <div class="hero-card-title">Sedang Diperiksa</div>
+            <div class="hero-card-desc">Santri Bayu S. — Prioritas Sedang</div>
+          </div>
+          <span class="badge badge-warning" style="margin-left:auto;">Sedang</span>
+        </div>
+        <div class="hero-card">
+          <div class="hero-card-icon" style="background:rgba(22,132,91,0.15);">💊</div>
+          <div>
+            <div class="hero-card-title">Resep Siap Diambil</div>
+            <div class="hero-card-desc">Farmasi — 3 Resep Antri</div>
+          </div>
+          <span class="badge badge-success" style="margin-left:auto;">Ringan</span>
+        </div>
+        <div class="hero-card">
+          <div class="hero-card-icon" style="background:rgba(255,255,255,0.1);">📊</div>
+          <div>
+            <div class="hero-card-title">Skor SAW Dihitung</div>
+            <div class="hero-card-desc">5 Kriteria × 8 Alternatif</div>
+          </div>
+          <span style="margin-left:auto;font-size:0.8rem;color:rgba(255,255,255,0.4);">0.87</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       STATS
+  ════════════════════════════════════════════════════════ -->
+  <section class="section section-alt" aria-labelledby="stats-heading">
+    <div class="container">
+      <h2 id="stats-heading" class="sr-only">Statistik Sistem</h2>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-number">10</div>
+          <div class="stat-label">Modul Sistem Terintegrasi</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">5</div>
+          <div class="stat-label">Kriteria SAW Klinis</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">3</div>
+          <div class="stat-label">Level Prioritas Triase</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">4</div>
+          <div class="stat-label">Peran Pengguna Sistem</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       FITUR
+  ════════════════════════════════════════════════════════ -->
+  <section id="fitur" class="section" aria-labelledby="fitur-heading">
+    <div class="container">
+      <div class="section-header">
+        <span class="eyebrow">Fitur Unggulan</span>
+        <h2 id="fitur-heading">Solusi Lengkap Manajemen Kesehatan Pesantren</h2>
+        <p>Dari triase darurat hingga laporan analitik, semua dalam satu platform terintegrasi.</p>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card card-hover">
+          <div class="feature-icon">🚑</div>
+          <h4>Papan Triase Real-time</h4>
+          <p>Tampilan antrean prioritas yang diperbarui otomatis berdasarkan skor SAW klinis santri.</p>
+        </div>
+        <div class="feature-card card-hover">
+          <div class="feature-icon">🧮</div>
+          <h4>Engine SAW Otomatis</h4>
+          <p>Perhitungan Simple Additive Weighting (SAW) dari data klinis untuk menentukan prioritas penanganan secara objektif.</p>
+        </div>
+        <div class="feature-card card-hover">
+          <div class="feature-icon">📝</div>
+          <h4>Rekam Medis Digital</h4>
+          <p>Pencatatan pemeriksaan, diagnosis, dan riwayat kesehatan santri tersimpan aman dan mudah diakses.</p>
+        </div>
+        <div class="feature-card card-hover">
+          <div class="feature-icon">💊</div>
+          <h4>Manajemen Farmasi</h4>
+          <p>CRUD stok obat, peringatan stok kritis, dan antrean resep yang terintegrasi dengan pemeriksaan klinis.</p>
+        </div>
+        <div class="feature-card card-hover">
+          <div class="feature-icon">👨‍👩‍👧</div>
+          <h4>Portal Santri & Wali</h4>
+          <p>Akses mandiri untuk memantau status kesehatan, riwayat kunjungan, dan notifikasi kepada orang tua/wali.</p>
+        </div>
+        <div class="feature-card card-hover">
+          <div class="feature-icon">📈</div>
+          <h4>Laporan & Analitik</h4>
+          <p>Grafik tren kunjungan, distribusi penyakit, penggunaan obat, dan laporan yang dapat diekspor.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       ALUR LAYANAN
+  ════════════════════════════════════════════════════════ -->
+  <section id="alur" class="section section-alt" aria-labelledby="alur-heading">
+    <div class="container">
+      <div class="section-header">
+        <span class="eyebrow">Alur Pelayanan</span>
+        <h2 id="alur-heading">Bagaimana Sistem Bekerja?</h2>
+        <p>Proses penanganan santri sakit yang terstruktur dan efisien dari awal hingga selesai.</p>
+      </div>
+
+      <div class="flow-grid">
+        <div class="flow-step">
+          <div class="flow-num" aria-hidden="true">1</div>
+          <h5>Pendaftaran</h5>
+          <p>Santri mendaftar di meja Poskestren atau melalui portal mandiri.</p>
+          <span class="flow-arrow" aria-hidden="true">›</span>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num" aria-hidden="true">2</div>
+          <h5>Triase Awal</h5>
+          <p>Petugas mengisi data klinis: keluhan, TTV, dan tanda darurat.</p>
+          <span class="flow-arrow" aria-hidden="true">›</span>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num" aria-hidden="true">3</div>
+          <h5>Hitung SAW</h5>
+          <p>Sistem menghitung skor prioritas secara otomatis menggunakan metode SAW.</p>
+          <span class="flow-arrow" aria-hidden="true">›</span>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num" aria-hidden="true">4</div>
+          <h5>Pemeriksaan</h5>
+          <p>Petugas menangani santri sesuai urutan prioritas yang ditampilkan di papan triase.</p>
+          <span class="flow-arrow" aria-hidden="true">›</span>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num" aria-hidden="true">5</div>
+          <h5>Resep & Farmasi</h5>
+          <p>Resep dikirim ke farmasi, obat disiapkan dan dicatat penggunaannya.</p>
+          <span class="flow-arrow" aria-hidden="true">›</span>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num" aria-hidden="true">6</div>
+          <h5>Laporan</h5>
+          <p>Data tersimpan otomatis untuk rekam medis, pelaporan, dan analitik kesehatan.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       TENTANG SAW
+  ════════════════════════════════════════════════════════ -->
+  <section id="tentang" class="section" aria-labelledby="tentang-heading">
+    <div class="container">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:3.5rem;align-items:center;">
+        <div>
+          <span class="eyebrow" style="font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--primary);display:block;margin-bottom:0.75rem;">Metode SAW</span>
+          <h2 id="tentang-heading" style="color:var(--text);margin-bottom:1rem;">Mengapa Simple Additive Weighting?</h2>
+          <p style="margin-bottom:1rem;">SAW adalah metode MCDM (Multi-Criteria Decision Making) yang menghitung skor dengan cara menormalisasi setiap kriteria klinis, lalu mengalikannya dengan bobot kepentingan yang telah ditetapkan oleh ahli medis.</p>
+          <p style="margin-bottom:1.5rem;">Hasilnya adalah skor prioritas yang transparan, dapat dijelaskan, dan konsisten — sangat cocok untuk lingkungan Poskestren.</p>
+          <div style="display:flex;flex-direction:column;gap:0.875rem;">
+            <div style="display:flex;align-items:center;gap:0.875rem;">
+              <div style="width:32px;height:32px;background:var(--success-bg);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;" aria-hidden="true">✅</div>
+              <span style="font-size:0.9rem;font-weight:500;color:var(--text);">Objektif dan berbasis data klinis terukur</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.875rem;">
+              <div style="width:32px;height:32px;background:var(--success-bg);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;" aria-hidden="true">✅</div>
+              <span style="font-size:0.9rem;font-weight:500;color:var(--text);">Mudah dipahami dan dapat dijelaskan ke petugas</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.875rem;">
+              <div style="width:32px;height:32px;background:var(--success-bg);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;" aria-hidden="true">✅</div>
+              <span style="font-size:0.9rem;font-weight:500;color:var(--text);">Proses cepat, cocok untuk kondisi darurat</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.875rem;">
+              <div style="width:32px;height:32px;background:var(--success-bg);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;" aria-hidden="true">✅</div>
+              <span style="font-size:0.9rem;font-weight:500;color:var(--text);">Bobot dapat disesuaikan oleh tenaga medis</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:1rem;">
+          <div class="card" style="border-left:4px solid var(--primary);">
+            <h5 style="color:var(--text);margin-bottom:0.75rem;">📐 Formula SAW</h5>
+            <div style="background:var(--bg);border-radius:8px;padding:1rem;font-family:monospace;font-size:0.875rem;color:var(--text);line-height:1.8;">
+              <div>R<sub>ij</sub> = x<sub>ij</sub> / max(x<sub>ij</sub>) &nbsp;<span style="color:var(--muted)">— Benefit</span></div>
+              <div>R<sub>ij</sub> = min(x<sub>ij</sub>) / x<sub>ij</sub> &nbsp;<span style="color:var(--muted)">— Cost</span></div>
+              <div style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border);">
+                V<sub>i</sub> = Σ (W<sub>j</sub> × R<sub>ij</sub>)
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <h5 style="color:var(--text);margin-bottom:0.75rem;">🏷️ Kriteria Penilaian</h5>
+            <div style="display:flex;flex-direction:column;gap:0.5rem;">
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.875rem;">
+                <span style="color:var(--text);">Tingkat Kesadaran (GCS)</span>
+                <span class="badge badge-emergency">Bobot 30%</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.875rem;">
+                <span style="color:var(--text);">Tanda Vital (TTV)</span>
+                <span class="badge badge-warning">Bobot 25%</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.875rem;">
+                <span style="color:var(--text);">Tingkat Nyeri</span>
+                <span class="badge badge-info">Bobot 20%</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.875rem;">
+                <span style="color:var(--text);">Durasi Keluhan</span>
+                <span class="badge badge-info">Bobot 15%</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.875rem;">
+                <span style="color:var(--text);">Riwayat Penyakit</span>
+                <span class="badge badge-neutral">Bobot 10%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       ROLE
+  ════════════════════════════════════════════════════════ -->
+  <section class="section section-alt" aria-labelledby="role-heading">
+    <div class="container">
+      <div class="section-header">
+        <span class="eyebrow">Multi-Role</span>
+        <h2 id="role-heading">Satu Sistem untuk Semua Pengguna</h2>
+        <p>Akses dan fitur yang disesuaikan dengan peran masing-masing pengguna.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.25rem;">
+        <div class="feature-card" style="text-align:center;">
+          <div style="font-size:2.5rem;margin-bottom:0.75rem;" aria-hidden="true">👨‍⚕️</div>
+          <h4 style="margin-bottom:0.5rem;">Admin / Petugas Kesehatan</h4>
+          <p style="font-size:0.8125rem;">Kelola triase, pemeriksaan, rekam medis, dan laporan kesehatan santri.</p>
+        </div>
+        <div class="feature-card" style="text-align:center;">
+          <div style="font-size:2.5rem;margin-bottom:0.75rem;" aria-hidden="true">💊</div>
+          <h4 style="margin-bottom:0.5rem;">Petugas Farmasi</h4>
+          <p style="font-size:0.8125rem;">Kelola stok obat, antrean resep, dan distribusi obat ke santri.</p>
+        </div>
+        <div class="feature-card" style="text-align:center;">
+          <div style="font-size:2.5rem;margin-bottom:0.75rem;" aria-hidden="true">🎓</div>
+          <h4 style="margin-bottom:0.5rem;">Santri (Border)</h4>
+          <p style="font-size:0.8125rem;">Pantau status kesehatan, jadwal kontrol, dan riwayat kunjungan secara mandiri.</p>
+        </div>
+        <div class="feature-card" style="text-align:center;">
+          <div style="font-size:2.5rem;margin-bottom:0.75rem;" aria-hidden="true">👨‍👩‍👧</div>
+          <h4 style="margin-bottom:0.5rem;">Wali Santri</h4>
+          <p style="font-size:0.8125rem;">Pantau kondisi anak dari jarak jauh dan terima notifikasi kondisi kesehatan.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <span style="display:inline-block;font-size:3rem;margin-bottom:1rem;" aria-hidden="true">🏥</span>
+      <h2>Siap Meningkatkan Layanan Kesehatan Pesantren?</h2>
+      <p>Mulai gunakan sistem SPK Health & Triase Poskestren Al-Bahjah Bogor sekarang.</p>
+      <a href="/auth/login" class="btn btn-accent btn-lg">
+        <span aria-hidden="true">🚀</span> Masuk ke Sistem
+      </a>
+    </div>
+  </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer role="contentinfo">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h4>SPK Health & Triase</h4>
+          <p>Sistem Pendukung Keputusan Penentuan Prioritas Penanganan Santri Sakit menggunakan metode SAW. Dikembangkan untuk Poskestren Al-Bahjah Cabang Bogor.</p>
+        </div>
+        <div class="footer-col">
+          <h5>Modul Sistem</h5>
+          <ul class="footer-links" role="list">
+            <li><a href="/auth/login">Landing Page</a></li>
+            <li><a href="/auth/login">Login Multi-Role</a></li>
+            <li><a href="/dashboard/admin">Dashboard Admin</a></li>
+            <li><a href="#">Papan Triase</a></li>
+            <li><a href="#">Engine SAW</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Informasi</h5>
+          <ul class="footer-links" role="list">
+            <li><a href="#tentang">Tentang SAW</a></li>
+            <li><a href="#alur">Alur Layanan</a></li>
+            <li><a href="#fitur">Fitur Sistem</a></li>
+            <li><a href="#">Bantuan</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2024 Poskestren Al-Bahjah Cabang Bogor. Proyek Semester 5.</span>
+        <span>SPK Health v1.0 — Fase 1</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/app.js"></script>
+  <script>
+    // Mobile nav toggle
+    const menuToggle = document.getElementById('menuToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    menuToggle.addEventListener('click', () => {
+      const isOpen = !mobileMenu.classList.contains('hidden');
+      mobileMenu.classList.toggle('hidden');
+      menuToggle.setAttribute('aria-expanded', String(!isOpen));
+    });
+    // Close mobile menu on link click
+    mobileMenu.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        mobileMenu.classList.add('hidden');
+        menuToggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+  </script>
+</body>
+</html>
