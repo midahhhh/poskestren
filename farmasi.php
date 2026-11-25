@@ -59,21 +59,70 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='tambah_obat
     $min   = (int)$_POST['stok_minimal'];
     $exp   = $_POST['exp_date'];
     $ket   = trim($_POST['keterangan']??'');
-    $stmt  = $conn->prepare("INSERT INTO obat (kategori_id,kode_obat,nama_obat,satuan,stok_minimal,stok_sekarang,exp_date,keterangan) VALUES (?,?,?,?,?,?,?,?)");
-    $stmt->bind_param("isssiiss", $kat,$kode,$nama,$sat,$min,$stok,$exp,$ket);
-    if ($stmt->execute()) {
-        $oid = $conn->insert_id;
-        $uid = $_SESSION['user_id'];
-        $jm  = 'masuk'; $kt = "Stok awal";
-        $s2  = $conn->prepare("INSERT INTO obat_mutasi_stok (obat_id,jenis_mutasi,jumlah,keterangan,user_id) VALUES (?,?,?,?,?)");
-        $s2->bind_param("isisi", $oid,$jm,$stok,$kt,$uid);
-        $s2->execute();
-        set_flash('success', "Obat '$nama' berhasil ditambahkan.");
-        header("Location: farmasi.php?tab=inventaris"); exit;
+    if ($kat > 0 && !empty($nama) && !empty($kode) && !empty($sat) && !empty($exp)) {
+        $stmt  = $conn->prepare("INSERT INTO obat (kategori_id,kode_obat,nama_obat,satuan,stok_minimal,stok_sekarang,exp_date,keterangan) VALUES (?,?,?,?,?,?,?,?)");
+        $stmt->bind_param("isssiiss", $kat,$kode,$nama,$sat,$min,$stok,$exp,$ket);
+        if ($stmt->execute()) {
+            $oid = $conn->insert_id;
+            $uid = $_SESSION['user_id'];
+            if ($stok > 0) {
+                $jm  = 'masuk'; $kt = "Stok awal (" . ($ket ?: "Logistik Farmasi") . ")";
+                $s2  = $conn->prepare("INSERT INTO obat_mutasi_stok (obat_id,jenis_mutasi,jumlah,keterangan,user_id) VALUES (?,?,?,?,?)");
+                $s2->bind_param("isisi", $oid,$jm,$stok,$kt,$uid);
+                $s2->execute();
+            }
+            set_flash('success', "Obat '$nama' ($kode) berhasil ditambahkan.");
+        } else {
+            set_flash('error', "Gagal menambah obat: " . ($conn->error ?: "Kode mungkin sudah terdaftar."));
+        }
     } else {
-        set_flash('error', "Gagal menambah obat. Kode mungkin sudah ada.");
-        header("Location: farmasi.php?tab=inventaris"); exit;
+        set_flash('error', "Mohon lengkapi seluruh kolom formulir obat.");
     }
+    header("Location: farmasi.php?tab=inventaris"); exit;
+}
+
+// ── Edit obat ────────────────────────────────────────────────
+if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='edit_obat') {
+    $id    = (int)($_POST['obat_id'] ?? 0);
+    $kat   = (int)($_POST['kategori_id'] ?? 0);
+    $kode  = trim($_POST['kode_obat'] ?? '');
+    $nama  = trim($_POST['nama_obat'] ?? '');
+    $sat   = trim($_POST['satuan'] ?? '');
+    $stok  = isset($_POST['stok_sekarang']) ? (int)$_POST['stok_sekarang'] : null;
+    $min   = (int)($_POST['stok_minimal'] ?? 10);
+    $exp   = $_POST['exp_date'] ?? '';
+    $ket   = trim($_POST['keterangan'] ?? '');
+    $uid   = $_SESSION['user_id'] ?? 1;
+
+    if ($id > 0 && $kat > 0 && !empty($nama) && !empty($kode) && !empty($sat) && !empty($exp)) {
+        $q_lama = $conn->query("SELECT stok_sekarang FROM obat WHERE id = $id LIMIT 1");
+        $stok_lama = ($q_lama && $r = $q_lama->fetch_assoc()) ? (int)$r['stok_sekarang'] : 0;
+
+        if ($stok !== null) {
+            $st = $conn->prepare("UPDATE obat SET kategori_id=?,kode_obat=?,nama_obat=?,satuan=?,stok_sekarang=?,stok_minimal=?,exp_date=?,keterangan=? WHERE id=?");
+            $st->bind_param("isssiissi", $kat, $kode, $nama, $sat, $stok, $min, $exp, $ket, $id);
+        } else {
+            $st = $conn->prepare("UPDATE obat SET kategori_id=?,kode_obat=?,nama_obat=?,satuan=?,stok_minimal=?,exp_date=?,keterangan=? WHERE id=?");
+            $st->bind_param("isssissi", $kat, $kode, $nama, $sat, $min, $exp, $ket, $id);
+        }
+
+        if ($st && $st->execute()) {
+            if ($stok !== null && $stok !== $stok_lama) {
+                $selisih = abs($stok - $stok_lama);
+                $jenis_m = $stok > $stok_lama ? 'masuk' : 'keluar';
+                $kt_m = "Penyesuaian stok saat edit data (sebelumnya $stok_lama, sekarang $stok)";
+                $s2 = $conn->prepare("INSERT INTO obat_mutasi_stok (obat_id,jenis_mutasi,jumlah,keterangan,user_id) VALUES (?,?,?,?,?)");
+                $s2->bind_param("isisi", $id, $jenis_m, $selisih, $kt_m, $uid);
+                $s2->execute();
+            }
+            set_flash('success', "Data obat '$nama' berhasil diperbarui.");
+        } else {
+            set_flash('error', "Gagal memperbarui obat: " . ($conn->error ?: "Kode mungkin sudah ada."));
+        }
+    } else {
+        set_flash('error', "Mohon lengkapi seluruh kolom formulir obat.");
+    }
+    header("Location: farmasi.php?tab=inventaris"); exit;
 }
 
 // ── Restock ──────────────────────────────────────────────────
@@ -84,13 +133,46 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='restock_oba
     $uid  = $_SESSION['user_id'];
     if ($oid>0 && $jml>0) {
         $conn->begin_transaction();
-        $conn->query("UPDATE obat SET stok_sekarang=stok_sekarang+$jml WHERE id=$oid");
-        $jm='masuk';
-        $stmt = $conn->prepare("INSERT INTO obat_mutasi_stok (obat_id,jenis_mutasi,jumlah,keterangan,user_id) VALUES (?,?,?,?,?)");
-        $stmt->bind_param("isisi", $oid,$jm,$jml,$ket,$uid);
-        $stmt->execute();
-        $conn->commit();
-        set_flash('success', "Stok berhasil ditambah (+$jml).");
+        try {
+            $conn->query("UPDATE obat SET stok_sekarang=stok_sekarang+$jml WHERE id=$oid");
+            $jm='masuk';
+            $stmt = $conn->prepare("INSERT INTO obat_mutasi_stok (obat_id,jenis_mutasi,jumlah,keterangan,user_id) VALUES (?,?,?,?,?)");
+            $stmt->bind_param("isisi", $oid,$jm,$jml,$ket,$uid);
+            $stmt->execute();
+            $conn->commit();
+            set_flash('success', "Stok berhasil ditambah (+$jml).");
+        } catch (Throwable $e) {
+            $conn->rollback();
+            set_flash('error', "Gagal restock: " . $e->getMessage());
+        }
+    }
+    header("Location: farmasi.php?tab=inventaris"); exit;
+}
+
+// ── Hapus obat ────────────────────────────────────────────────
+if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='hapus_obat') {
+    $oid = (int)($_POST['obat_id'] ?? 0);
+    if ($oid > 0) {
+        $res_cek = $conn->query("SELECT COUNT(*) c FROM resep_obat_detail rd 
+                                 JOIN resep_obat r ON rd.resep_id=r.id 
+                                 WHERE rd.obat_id=$oid AND r.status_resep IN ('menunggu_proses','diproses')");
+        $cek = ($res_cek && $res_cek instanceof mysqli_result) ? (int)($res_cek->fetch_assoc()['c'] ?? 0) : 0;
+        if ($cek > 0) {
+            set_flash('error', "Obat tidak dapat dihapus karena masih tercatat dalam antrean resep aktif.");
+        } else {
+            $conn->begin_transaction();
+            try {
+                $conn->query("DELETE FROM obat_mutasi_stok WHERE obat_id = $oid");
+                $conn->query("DELETE FROM resep_obat_detail WHERE obat_id = $oid");
+                $del = $conn->query("DELETE FROM obat WHERE id = $oid");
+                if (!$del) throw new Exception($conn->error ?: "Gagal menghapus data obat.");
+                $conn->commit();
+                set_flash('success', "Obat berhasil dihapus.");
+            } catch (Throwable $e) {
+                $conn->rollback();
+                set_flash('error', "Gagal menghapus obat: " . $e->getMessage());
+            }
+        }
     }
     header("Location: farmasi.php?tab=inventaris"); exit;
 }
@@ -297,10 +379,29 @@ $hampir_exp    = $conn->query("SELECT COUNT(*) c FROM obat WHERE exp_date<=DATE_
                                     <?php if ($exp60): ?><div style="font-size:10px;color:#D64545;font-weight:600;">⚠ Mendekati ED!</div><?php endif; ?>
                                 </td>
                                 <td style="padding:12px 16px;text-align:right;" class="no-print">
-                                    <button onclick="bukaRestock(<?=$ob['id']?>,'<?=addslashes($ob['nama_obat'])?>','<?=$ob['satuan']?>')"
-                                            class="btn btn-dark" style="font-size:11px;padding:5px 12px;">
-                                        + Restock
-                                    </button>
+                                    <div style="display:inline-flex;gap:6px;align-items:center;">
+                                        <button type="button" 
+                                                data-id="<?=$ob['id']?>" 
+                                                data-nama="<?=htmlspecialchars($ob['nama_obat'], ENT_QUOTES, 'UTF-8')?>" 
+                                                data-satuan="<?=htmlspecialchars($ob['satuan'], ENT_QUOTES, 'UTF-8')?>" 
+                                                onclick="bukaRestock(this.dataset.id, this.dataset.nama, this.dataset.satuan)"
+                                                class="btn btn-dark" style="font-size:11px;padding:5px 10px;">
+                                            + Restock
+                                        </button>
+                                        <button type="button" 
+                                                data-obat='<?=htmlspecialchars(json_encode($ob, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP), ENT_QUOTES, 'UTF-8')?>' 
+                                                onclick="bukaEditObat(JSON.parse(this.dataset.obat))"
+                                                class="btn" style="font-size:11px;padding:5px 10px;background:#f0fdf4;color:#16845B;border:1px solid #bbf7d0;">
+                                            Edit
+                                        </button>
+                                        <button type="button" 
+                                                data-id="<?=$ob['id']?>" 
+                                                data-nama="<?=htmlspecialchars($ob['nama_obat'], ENT_QUOTES, 'UTF-8')?>" 
+                                                onclick="hapusObat(this.dataset.id, this.dataset.nama)"
+                                                class="btn" style="font-size:11px;padding:5px 10px;background:#fef2f2;color:#D64545;border:1px solid #fecaca;">
+                                            Hapus
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                             <?php endwhile; ?>
@@ -450,6 +551,74 @@ $hampir_exp    = $conn->query("SELECT COUNT(*) c FROM obat WHERE exp_date<=DATE_
         </div>
     </div>
 
+    <!-- ── MODAL EDIT OBAT ───────────────────────────────────── -->
+    <div id="modalEdit" style="display:none;position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.5);align-items:center;justify-content:center;padding:16px;">
+        <div class="card" style="max-width:520px;width:100%;padding:24px;max-height:90vh;overflow-y:auto;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #d8e6de;">
+                <div style="font-weight:700;font-size:14px;color:#0B3D2E;">Edit Data Obat</div>
+                <button type="button" onclick="document.getElementById('modalEdit').style.display='none'" style="background:none;border:none;cursor:pointer;font-size:20px;color:#9ca3af;">&times;</button>
+            </div>
+            <form method="POST" action="farmasi.php" style="display:flex;flex-direction:column;gap:14px;">
+                <input type="hidden" name="action" value="edit_obat">
+                <input type="hidden" name="obat_id" id="edit_id">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div>
+                        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:5px;">Kode Obat</label>
+                        <input type="text" name="kode_obat" id="edit_kode" required class="input-field">
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:5px;">Kategori</label>
+                        <select name="kategori_id" id="edit_kat" required class="input-field">
+                            <?php
+                            if ($res_kat) {
+                                $res_kat->data_seek(0);
+                                while ($kat=$res_kat->fetch_assoc()):
+                            ?>
+                            <option value="<?=$kat['id']?>"><?=htmlspecialchars($kat['nama_kategori'])?></option>
+                            <?php endwhile; } ?>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label style="display:block;font-size:12px;font-weight:600;margin-bottom:5px;">Nama Obat</label>
+                    <input type="text" name="nama_obat" id="edit_nama" required class="input-field">
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+                    <div>
+                        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:5px;">Satuan</label>
+                        <input type="text" name="satuan" id="edit_sat" required class="input-field">
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:5px;">Stok Fisik</label>
+                        <input type="number" name="stok_sekarang" id="edit_stok" required min="0" class="input-field">
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:5px;">Stok Min</label>
+                        <input type="number" name="stok_minimal" id="edit_min" required min="1" class="input-field">
+                    </div>
+                </div>
+                <div>
+                    <label style="display:block;font-size:12px;font-weight:600;margin-bottom:5px;">Tanggal Expired</label>
+                    <input type="date" name="exp_date" id="edit_exp" required class="input-field">
+                </div>
+                <div>
+                    <label style="display:block;font-size:12px;font-weight:600;margin-bottom:5px;">Keterangan / Indikasi</label>
+                    <input type="text" name="keterangan" id="edit_ket" class="input-field">
+                </div>
+                <div style="display:flex;justify-content:flex-end;gap:10px;padding-top:4px;">
+                    <button type="button" onclick="document.getElementById('modalEdit').style.display='none'" class="btn btn-outline">Batal</button>
+                    <button type="submit" class="btn btn-green">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Form Hapus Obat Tersembunyi -->
+    <form id="formHapusObat" method="POST" action="farmasi.php" style="display:none;">
+        <input type="hidden" name="action" value="hapus_obat">
+        <input type="hidden" name="obat_id" id="hapus_id">
+    </form>
+
     <script>
         function serahkan(id, nama) {
             if (confirm('Serahkan obat kepada ' + nama + ' dan potong stok inventaris?')) {
@@ -464,8 +633,28 @@ $hampir_exp    = $conn->query("SELECT COUNT(*) c FROM obat WHERE exp_date<=DATE_
             document.getElementById('modalRestock').style.display = 'flex';
         }
 
+        function bukaEditObat(ob) {
+            document.getElementById('edit_id').value   = ob.id;
+            document.getElementById('edit_kode').value = ob.kode_obat;
+            document.getElementById('edit_nama').value = ob.nama_obat;
+            document.getElementById('edit_kat').value  = ob.kategori_id;
+            document.getElementById('edit_sat').value  = ob.satuan;
+            document.getElementById('edit_stok').value = ob.stok_sekarang || 0;
+            document.getElementById('edit_min').value  = ob.stok_minimal;
+            document.getElementById('edit_exp').value  = ob.exp_date;
+            document.getElementById('edit_ket').value  = ob.keterangan || '';
+            document.getElementById('modalEdit').style.display = 'flex';
+        }
+
+        function hapusObat(id, nama) {
+            if (confirm("Apakah Anda yakin ingin menghapus obat '" + nama + "' dari inventaris?")) {
+                document.getElementById('hapus_id').value = id;
+                document.getElementById('formHapusObat').submit();
+            }
+        }
+
         // Tutup modal klik backdrop
-        ['modalTambah','modalRestock'].forEach(id => {
+        ['modalTambah','modalRestock','modalEdit'].forEach(id => {
             const el = document.getElementById(id);
             if (el) {
                 el.addEventListener('click', function(e) {

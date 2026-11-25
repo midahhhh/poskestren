@@ -30,31 +30,33 @@ $action = $_POST['action'] ?? '';
 
 // 1. Tambah Obat Baru
 if ($action === 'tambah_obat') {
-    $kat  = (int)$_POST['kategori_id'];
-    $kode = trim($_POST['kode_obat']);
-    $nama = trim($_POST['nama_obat']);
-    $sat  = trim($_POST['satuan']);
-    $min  = (int)$_POST['stok_minimal'];
-    $stok = (int)$_POST['stok_sekarang'];
-    $exp  = $_POST['exp_date'];
+    $kat  = (int)($_POST['kategori_id'] ?? 0);
+    $kode = trim($_POST['kode_obat'] ?? '');
+    $nama = trim($_POST['nama_obat'] ?? '');
+    $sat  = trim($_POST['satuan'] ?? '');
+    $min  = (int)($_POST['stok_minimal'] ?? 10);
+    $stok = (int)($_POST['stok_sekarang'] ?? 0);
+    $exp  = $_POST['exp_date'] ?? '';
     $ket  = trim($_POST['keterangan'] ?? '');
 
-    if ($nama && $kode && $sat && $exp) {
+    if ($nama && $kode && $sat && $exp && $kat > 0) {
         $st = $conn->prepare("INSERT INTO obat (kategori_id,kode_obat,nama_obat,satuan,stok_minimal,stok_sekarang,exp_date,keterangan) VALUES (?,?,?,?,?,?,?,?)");
         $st->bind_param("isssiiss", $kat, $kode, $nama, $sat, $min, $stok, $exp, $ket);
         if ($st->execute()) {
             $oid = $conn->insert_id;
-            $jm  = 'masuk';
-            $kt  = "Stok awal pengadaan obat baru (Mitra Farmasi)";
-            $s2  = $conn->prepare("INSERT INTO obat_mutasi_stok (obat_id,jenis_mutasi,jumlah,keterangan,user_id) VALUES (?,?,?,?,?)");
-            $s2->bind_param("isisi", $oid, $jm, $stok, $kt, $user_id);
-            $s2->execute();
-            set_flash('success', "Item obat '$nama' berhasil ditambahkan ke inventaris.");
+            if ($stok > 0) {
+                $jm  = 'masuk';
+                $kt  = "Stok awal pengadaan obat baru (" . ($ket ?: "Logistik Farmasi") . ")";
+                $s2  = $conn->prepare("INSERT INTO obat_mutasi_stok (obat_id,jenis_mutasi,jumlah,keterangan,user_id) VALUES (?,?,?,?,?)");
+                $s2->bind_param("isisi", $oid, $jm, $stok, $kt, $user_id);
+                $s2->execute();
+            }
+            set_flash('success', "Item obat '$nama' ($kode) berhasil ditambahkan ke inventaris.");
         } else {
-            set_flash('error', "Gagal menambahkan obat. Kode obat '$kode' kemungkinan sudah terdaftar.");
+            set_flash('error', "Gagal menambahkan obat. Kode obat '$kode' kemungkinan sudah terdaftar atau terjadi kesalahan database.");
         }
     } else {
-        set_flash('error', "Mohon lengkapi seluruh kolom formulir penambahan obat.");
+        set_flash('error', "Mohon lengkapi seluruh kolom formulir penambahan obat (termasuk kategori dan tanggal kadaluarsa).");
     }
     header("Location: dashboard_farmasi.php#inventaris-obat"); 
     exit();
@@ -62,23 +64,43 @@ if ($action === 'tambah_obat') {
 
 // 2. Edit / Perbarui Data Obat
 if ($action === 'edit_obat') {
-    $id   = (int)$_POST['obat_id'];
-    $kat  = (int)$_POST['kategori_id'];
-    $kode = trim($_POST['kode_obat']);
-    $nama = trim($_POST['nama_obat']);
-    $sat  = trim($_POST['satuan']);
-    $min  = (int)$_POST['stok_minimal'];
-    $exp  = $_POST['exp_date'];
+    $id   = (int)($_POST['obat_id'] ?? 0);
+    $kat  = (int)($_POST['kategori_id'] ?? 0);
+    $kode = trim($_POST['kode_obat'] ?? '');
+    $nama = trim($_POST['nama_obat'] ?? '');
+    $sat  = trim($_POST['satuan'] ?? '');
+    $stok = isset($_POST['stok_sekarang']) ? (int)$_POST['stok_sekarang'] : null;
+    $min  = (int)($_POST['stok_minimal'] ?? 10);
+    $exp  = $_POST['exp_date'] ?? '';
     $ket  = trim($_POST['keterangan'] ?? '');
 
-    if ($id && $nama) {
-        $st = $conn->prepare("UPDATE obat SET kategori_id=?,kode_obat=?,nama_obat=?,satuan=?,stok_minimal=?,exp_date=?,keterangan=? WHERE id=?");
-        $st->bind_param("isssissi", $kat, $kode, $nama, $sat, $min, $exp, $ket, $id);
-        if ($st->execute()) {
+    if ($id > 0 && $nama && $kode && $sat && $exp && $kat > 0) {
+        $q_lama = $conn->query("SELECT stok_sekarang FROM obat WHERE id = $id LIMIT 1");
+        $stok_lama = ($q_lama && $r = $q_lama->fetch_assoc()) ? (int)$r['stok_sekarang'] : 0;
+
+        if ($stok !== null) {
+            $st = $conn->prepare("UPDATE obat SET kategori_id=?,kode_obat=?,nama_obat=?,satuan=?,stok_sekarang=?,stok_minimal=?,exp_date=?,keterangan=? WHERE id=?");
+            $st->bind_param("isssiissi", $kat, $kode, $nama, $sat, $stok, $min, $exp, $ket, $id);
+        } else {
+            $st = $conn->prepare("UPDATE obat SET kategori_id=?,kode_obat=?,nama_obat=?,satuan=?,stok_minimal=?,exp_date=?,keterangan=? WHERE id=?");
+            $st->bind_param("isssissi", $kat, $kode, $nama, $sat, $min, $exp, $ket, $id);
+        }
+
+        if ($st && $st->execute()) {
+            if ($stok !== null && $stok !== $stok_lama) {
+                $selisih = abs($stok - $stok_lama);
+                $jenis_m = $stok > $stok_lama ? 'masuk' : 'keluar';
+                $kt_m = "Penyesuaian stok saat edit data (sebelumnya $stok_lama, sekarang $stok)";
+                $s2 = $conn->prepare("INSERT INTO obat_mutasi_stok (obat_id,jenis_mutasi,jumlah,keterangan,user_id) VALUES (?,?,?,?,?)");
+                $s2->bind_param("isisi", $id, $jenis_m, $selisih, $kt_m, $user_id);
+                $s2->execute();
+            }
             set_flash('success', "Data obat '$nama' berhasil diperbarui.");
         } else {
-            set_flash('error', "Gagal memperbarui data obat.");
+            set_flash('error', "Gagal memperbarui data obat: " . ($conn->error ?: "Pastikan kode obat unik."));
         }
+    } else {
+        set_flash('error', "Mohon lengkapi seluruh kolom formulir edit obat.");
     }
     header("Location: dashboard_farmasi.php#inventaris-obat"); 
     exit();
@@ -86,24 +108,27 @@ if ($action === 'edit_obat') {
 
 // 3. Restock / Tambah Stok Obat
 if ($action === 'restock_obat') {
-    $id     = (int)$_POST['obat_id'];
-    $jumlah = (int)$_POST['jumlah'];
+    $id     = (int)($_POST['obat_id'] ?? 0);
+    $jumlah = (int)($_POST['jumlah'] ?? 0);
     $ket    = trim($_POST['keterangan'] ?? "Restock pengadaan logistik Farmasi");
 
-    if ($id && $jumlah > 0) {
+    if ($id > 0 && $jumlah > 0) {
         $conn->begin_transaction();
         try {
-            $conn->query("UPDATE obat SET stok_sekarang = stok_sekarang + $jumlah WHERE id = $id");
+            $upd = $conn->query("UPDATE obat SET stok_sekarang = stok_sekarang + $jumlah WHERE id = $id");
+            if (!$upd) throw new Exception($conn->error ?: "Gagal memperbarui stok obat.");
             $jm = 'masuk';
             $s2 = $conn->prepare("INSERT INTO obat_mutasi_stok (obat_id,jenis_mutasi,jumlah,keterangan,user_id) VALUES (?,?,?,?,?)");
             $s2->bind_param("isisi", $id, $jm, $jumlah, $ket, $user_id);
             $s2->execute();
             $conn->commit();
             set_flash('success', "Berhasil menambahkan $jumlah unit stok obat.");
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $conn->rollback();
             set_flash('error', "Gagal restock: " . $e->getMessage());
         }
+    } else {
+        set_flash('error', "Jumlah unit restock obat harus lebih dari 0.");
     }
     header("Location: dashboard_farmasi.php#inventaris-obat"); 
     exit();
@@ -111,19 +136,29 @@ if ($action === 'restock_obat') {
 
 // 4. Hapus Obat
 if ($action === 'hapus_obat') {
-    $id = (int)$_POST['obat_id'];
-    if ($id) {
+    $id = (int)($_POST['obat_id'] ?? 0);
+    if ($id > 0) {
         $res_cek = $conn->query("SELECT COUNT(*) c FROM resep_obat_detail rd 
-                             JOIN resep_obat r ON rd.resep_id=r.id 
-                             WHERE rd.obat_id=$id AND r.status_resep IN ('menunggu','menunggu_proses','diproses')");
+                                 JOIN resep_obat r ON rd.resep_id=r.id 
+                                 WHERE rd.obat_id=$id AND r.status_resep IN ('menunggu_proses','diproses')");
         $cek = ($res_cek && $res_cek instanceof mysqli_result) ? (int)($res_cek->fetch_assoc()['c'] ?? 0) : 0;
         if ($cek > 0) {
-            set_flash('error', "Obat tidak dapat dihapus karena tercatat dalam antrean resep aktif.");
+            set_flash('error', "Obat tidak dapat dihapus karena masih tercatat dalam antrean resep aktif.");
         } else {
-            $conn->query("DELETE FROM obat_mutasi_stok WHERE obat_id = $id");
-            $conn->query("DELETE FROM resep_obat_detail WHERE obat_id = $id");
-            $conn->query("DELETE FROM obat WHERE id = $id");
-            set_flash('success', "Obat berhasil dihapus dari inventaris.");
+            $conn->begin_transaction();
+            try {
+                $conn->query("DELETE FROM obat_mutasi_stok WHERE obat_id = $id");
+                $conn->query("DELETE FROM resep_obat_detail WHERE obat_id = $id");
+                $del = $conn->query("DELETE FROM obat WHERE id = $id");
+                if (!$del) {
+                    throw new Exception($conn->error ?: "Gagal menghapus data obat dari tabel inventaris.");
+                }
+                $conn->commit();
+                set_flash('success', "Obat berhasil dihapus dari inventaris.");
+            } catch (Throwable $e) {
+                $conn->rollback();
+                set_flash('error', "Gagal menghapus obat: " . $e->getMessage());
+            }
         }
     }
     header("Location: dashboard_farmasi.php#inventaris-obat"); 
@@ -132,9 +167,9 @@ if ($action === 'hapus_obat') {
 
 // 5. Simpan Catatan Logistik untuk Admin
 if ($action === 'simpan_catatan_admin') {
-    $id      = (int)$_POST['obat_id'];
+    $id      = (int)($_POST['obat_id'] ?? 0);
     $catatan = trim($_POST['catatan_admin'] ?? '');
-    if ($id) {
+    if ($id > 0) {
         $prefix = "[Pesan Farmasi " . date('d/m/Y H:i') . "]: ";
         $ket_baru = $catatan ? $prefix . $catatan : '';
         $st = $conn->prepare("UPDATE obat SET keterangan = ? WHERE id = ?");
@@ -177,7 +212,7 @@ if (isset($_GET['serahkan_resep_id'])) {
             $s2->bind_param("isisi", $it['obat_id'], $mut, $it['jumlah'], $ket, $user_id);
             $s2->execute();
         }
-        $conn->query("UPDATE resep_obat SET status_resep='selesai' WHERE id=$resep_id");
+        $conn->query("UPDATE resep_obat SET status_resep='selesai', petugas_farmasi_id=$user_id WHERE id=$resep_id");
         $conn->commit();
         set_flash('success', "Resep telah diserahkan kepada santri. Stok obat otomatis terpotong.");
     } catch (Exception $e) {
@@ -609,23 +644,35 @@ if ($res_kategori) {
                                 <td class="py-2.5 px-3 text-right">
                                     <div class="inline-flex items-center gap-1.5">
                                         <!-- Restock -->
-                                        <button type="button" onclick="bukaModalRestock(<?= $ob['id']; ?>, '<?= addslashes($ob['nama_obat']); ?>')" 
-                                                class="px-2 py-1 rounded border border-[#DCE7E0] hover:bg-emerald-50 text-[#16845B] font-semibold transition" title="Tambah Stok">
+                                        <button type="button" 
+                                                data-id="<?= (int)$ob['id']; ?>"
+                                                data-nama="<?= htmlspecialchars($ob['nama_obat'], ENT_QUOTES, 'UTF-8'); ?>"
+                                                onclick="bukaModalRestock(this.dataset.id, this.dataset.nama)" 
+                                                class="px-2 py-1 rounded border border-[#DCE7E0] hover:bg-emerald-50 text-[#16845B] font-semibold transition cursor-pointer" title="Tambah Stok">
                                             + Stok
                                         </button>
                                         <!-- Edit -->
-                                        <button type="button" onclick='bukaModalEdit(<?= json_encode($ob); ?>)' 
-                                                class="px-2 py-1 rounded border border-[#DCE7E0] hover:bg-slate-100 text-[#0B3D2E] font-semibold transition" title="Edit Data">
+                                        <button type="button" 
+                                                data-obat='<?= htmlspecialchars(json_encode($ob, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP), ENT_QUOTES, 'UTF-8'); ?>'
+                                                onclick="bukaModalEdit(JSON.parse(this.dataset.obat))" 
+                                                class="px-2 py-1 rounded border border-[#DCE7E0] hover:bg-slate-100 text-[#0B3D2E] font-semibold transition cursor-pointer" title="Edit Data">
                                             Edit
                                         </button>
                                         <!-- Catatan Admin -->
-                                        <button type="button" onclick="bukaModalCatatan(<?= $ob['id']; ?>, '<?= addslashes($ob['nama_obat']); ?>', '<?= addslashes($ob['keterangan'] ?? ''); ?>')" 
-                                                class="px-2 py-1 rounded border border-[#DCE7E0] hover:bg-amber-50 text-amber-800 font-semibold transition" title="Kirim Catatan ke Admin">
+                                        <button type="button" 
+                                                data-id="<?= (int)$ob['id']; ?>"
+                                                data-nama="<?= htmlspecialchars($ob['nama_obat'], ENT_QUOTES, 'UTF-8'); ?>"
+                                                data-ket="<?= htmlspecialchars($ob['keterangan'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                                                onclick="bukaModalCatatan(this.dataset.id, this.dataset.nama, this.dataset.ket)" 
+                                                class="px-2 py-1 rounded border border-[#DCE7E0] hover:bg-amber-50 text-amber-800 font-semibold transition cursor-pointer" title="Kirim Catatan ke Admin">
                                             Catatan
                                         </button>
                                         <!-- Hapus -->
-                                        <button type="button" onclick="konfirmasiHapusObat(<?= $ob['id']; ?>, '<?= addslashes($ob['nama_obat']); ?>')" 
-                                                class="px-2 py-1 rounded border border-[#DCE7E0] hover:bg-red-50 text-red-700 font-semibold transition" title="Hapus Obat">
+                                        <button type="button" 
+                                                data-id="<?= (int)$ob['id']; ?>"
+                                                data-nama="<?= htmlspecialchars($ob['nama_obat'], ENT_QUOTES, 'UTF-8'); ?>"
+                                                onclick="konfirmasiHapusObat(this.dataset.id, this.dataset.nama)" 
+                                                class="px-2 py-1 rounded border border-[#DCE7E0] hover:bg-red-50 text-red-700 font-semibold transition cursor-pointer" title="Hapus Obat">
                                             Hapus
                                         </button>
                                     </div>
@@ -746,7 +793,11 @@ if ($res_kategori) {
                     <label class="block font-semibold text-[#0B3D2E] mb-1">Nama Obat</label>
                     <input type="text" name="nama_obat" id="edit-nama" required class="w-full p-2 rounded-lg border border-[#DCE7E0] bg-[#F5F8F6]">
                 </div>
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block font-semibold text-[#0B3D2E] mb-1">Stok Saat Ini</label>
+                        <input type="number" name="stok_sekarang" id="edit-stok" min="0" required class="w-full p-2 rounded-lg border border-[#DCE7E0] bg-[#F5F8F6] mono-num font-bold">
+                    </div>
                     <div>
                         <label class="block font-semibold text-[#0B3D2E] mb-1">Batas Minimal</label>
                         <input type="number" name="stok_minimal" id="edit-minimal" min="1" required class="w-full p-2 rounded-lg border border-[#DCE7E0] bg-[#F5F8F6] mono-num">
@@ -852,6 +903,9 @@ if ($res_kategori) {
             document.getElementById('edit-nama').value = ob.nama_obat;
             document.getElementById('edit-kat').value = ob.kategori_id;
             document.getElementById('edit-satuan').value = ob.satuan;
+            if (document.getElementById('edit-stok')) {
+                document.getElementById('edit-stok').value = ob.stok_sekarang || 0;
+            }
             document.getElementById('edit-minimal').value = ob.stok_minimal;
             document.getElementById('edit-exp').value = ob.exp_date;
             document.getElementById('edit-ket').value = ob.keterangan || '';
