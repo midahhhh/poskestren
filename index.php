@@ -317,43 +317,55 @@ require_once 'koneksi.php';
 
     <!-- CS CHAT WIDGET -->
     <div class="fixed bottom-6 right-6 z-50">
-        <button id="chat-toggle-btn" onclick="toggleChat()" class="w-14 h-14 bg-primary-green hover:bg-deep-green text-white rounded-full flex items-center justify-center shadow-2xl transition-all hover:scale-105 relative">
-            <i data-lucide="message-circle" class="w-7 h-7"></i>
-            <span class="absolute -top-1 -right-1 w-4 h-4 bg-warm-yellow rounded-full border-2 border-white"></span>
+        <button id="chat-toggle-btn" onclick="toggleChat()" class="w-14 h-14 bg-primary-green hover:bg-deep-green text-white rounded-full flex items-center justify-center shadow-2xl transition-all hover:scale-105 relative group" title="Chat dengan Asisten AI Poskestren">
+            <i data-lucide="bot" class="w-7 h-7"></i>
+            <span class="absolute -top-1 -right-1 w-4 h-4 bg-warm-yellow rounded-full border-2 border-white animate-pulse"></span>
         </button>
 
         <div id="chat-box" class="hidden absolute bottom-16 right-0 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-border-color overflow-hidden chat-drawer">
-            <div class="bg-deep-green p-4 text-white flex justify-between items-center">
+            <div class="bg-deep-green p-4 text-white flex justify-between items-center shadow-sm">
                 <div class="flex items-center space-x-3">
-                    <div class="w-9 h-9 bg-primary-green rounded-full flex items-center justify-center">
-                        <i data-lucide="headset" class="w-5 h-5"></i>
+                    <div class="w-9 h-9 bg-primary-green rounded-full flex items-center justify-center shadow-inner">
+                        <i data-lucide="bot" class="w-5 h-5 text-white"></i>
                     </div>
                     <div>
-                        <h4 class="text-sm font-bold">CS Poskestren Al-Bahjah</h4>
-                        <p class="text-xs text-emerald-300 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Online / Siaga</p>
+                        <h4 class="text-sm font-bold flex items-center gap-1.5">
+                            Asisten AI Poskestren
+                            <span class="text-[10px] bg-emerald-400/20 text-emerald-300 font-medium px-1.5 py-0.5 rounded-full border border-emerald-400/30">AI Live</span>
+                        </h4>
+                        <p class="text-xs text-emerald-300 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Respons Otomatis 24 Jam</p>
                     </div>
                 </div>
-                <button onclick="toggleChat()" class="text-gray-300 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+                <button onclick="toggleChat()" class="text-gray-300 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
 
-            <div id="chat-messages" class="p-4 h-64 overflow-y-auto space-y-3 bg-app-bg text-xs">
+            <div id="chat-messages" class="p-4 h-72 overflow-y-auto space-y-3 bg-app-bg text-xs">
                 <div class="flex items-start space-x-2">
-                    <div class="w-7 h-7 bg-primary-green text-white rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold">CS</div>
-                    <div class="bg-white p-3 rounded-2xl rounded-tl-none border border-border-color text-text-main max-w-[80%]">
-                        <p class="font-semibold text-primary-green mb-1">Petugas Poskestren</p>
-                        Assalamu'alaikum Wr. Wb. Ada yang bisa kami bantu terkait informasi pelayanan kesehatan atau kondisi santri di Poskestren Al-Bahjah Bogor?
+                    <div class="w-7 h-7 bg-primary-green text-white rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold shadow-sm">
+                        <i data-lucide="bot" class="w-4 h-4"></i>
+                    </div>
+                    <div class="bg-white p-3 rounded-2xl rounded-tl-none border border-border-color text-text-main max-w-[85%] shadow-sm">
+                        <p class="font-semibold text-primary-green mb-1 flex items-center gap-1">
+                            <span>Asisten AI Poskestren</span>
+                            <span class="text-[9px] bg-emerald-50 text-emerald-700 px-1 py-0.2 rounded border border-emerald-200">Bot Medis</span>
+                        </p>
+                        Assalamu'alaikum Wr. Wb. Saya Asisten Virtual AI Poskestren Al-Bahjah Bogor. Ada yang bisa saya bantu terkait jadwal operasional, informasi antrean santri, panduan triase SAW, atau pertolongan pertama kesehatan?
                     </div>
                 </div>
             </div>
 
-            <div class="px-3 py-2 bg-white border-t border-border-color flex gap-2 overflow-x-auto text-[11px]">
-                <button onclick="sendQuickMsg('Bagaimana alur izin rawat inap santri?')" class="px-2.5 py-1 bg-app-bg border border-border-color hover:bg-primary-green/10 text-text-main rounded-lg whitespace-nowrap">Izin Rawat Inap</button>
-                <button onclick="sendQuickMsg('Berapa nomor telepon darurat poskestren?')" class="px-2.5 py-1 bg-app-bg border border-border-color hover:bg-primary-green/10 text-text-main rounded-lg whitespace-nowrap">Nomor Darurat</button>
+            <!-- Quick prompt pills -->
+            <div class="px-3 py-2 bg-white border-t border-border-color flex gap-1.5 overflow-x-auto text-[11px] no-scrollbar">
+                <button onclick="sendQuickMsg('Jam operasional poskestren?')" class="px-2.5 py-1 bg-app-bg border border-border-color hover:bg-primary-green/10 hover:border-primary-green text-text-main rounded-lg whitespace-nowrap transition-colors flex items-center gap-1">⏱️ Jam Buka</button>
+                <button onclick="sendQuickMsg('Berapa antrean pasien saat ini?')" class="px-2.5 py-1 bg-app-bg border border-border-color hover:bg-primary-green/10 hover:border-primary-green text-text-main rounded-lg whitespace-nowrap transition-colors flex items-center gap-1">📊 Cek Antrean</button>
+                <button onclick="sendQuickMsg('Bagaimana alur triase SAW santri?')" class="px-2.5 py-1 bg-app-bg border border-border-color hover:bg-primary-green/10 hover:border-primary-green text-text-main rounded-lg whitespace-nowrap transition-colors flex items-center gap-1">🩺 Triase SAW</button>
+                <button onclick="sendQuickMsg('Pertolongan pertama santri demam')" class="px-2.5 py-1 bg-app-bg border border-border-color hover:bg-primary-green/10 hover:border-primary-green text-text-main rounded-lg whitespace-nowrap transition-colors flex items-center gap-1">🌡️ Santri Demam</button>
+                <button onclick="sendQuickMsg('Berapa nomor telepon darurat poskestren?')" class="px-2.5 py-1 bg-app-bg border border-border-color hover:bg-primary-green/10 hover:border-primary-green text-text-main rounded-lg whitespace-nowrap transition-colors flex items-center gap-1">📞 Darurat</button>
             </div>
 
             <form id="chat-form" class="p-3 bg-white border-t border-border-color flex gap-2">
-                <input type="text" id="chat-input" placeholder="Tulis pesan Anda..." class="flex-1 text-xs border border-border-color rounded-xl px-3 py-2 focus:outline-none focus:border-primary-green bg-app-bg" required>
-                <button type="submit" class="p-2 bg-primary-green text-white rounded-xl hover:bg-deep-green transition-colors">
+                <input type="text" id="chat-input" placeholder="Tanyakan ke Asisten AI..." class="flex-1 text-xs border border-border-color rounded-xl px-3 py-2 focus:outline-none focus:border-primary-green bg-app-bg" required autocomplete="off">
+                <button type="submit" id="chat-send-btn" class="p-2 bg-primary-green text-white rounded-xl hover:bg-deep-green transition-colors shadow-sm flex items-center justify-center">
                     <i data-lucide="send" class="w-4 h-4"></i>
                 </button>
             </form>
@@ -379,27 +391,36 @@ require_once 'koneksi.php';
         function toggleChat() {
             const box = document.getElementById('chat-box');
             box.classList.toggle('hidden');
-            if (!box.classList.contains('hidden')) startPolling();
+            if (!box.classList.contains('hidden')) {
+                startPolling();
+                document.getElementById('chat-input').focus();
+            }
         }
 
-        // ── Kirim pesan ke server ─────────────────────────────────────
+        // ── Kirim pesan cepat dari tombol rekomendasi ────────────────
         function sendQuickMsg(text) {
             document.getElementById('chat-input').value = text;
             document.getElementById('chat-form').dispatchEvent(new Event('submit', { cancelable: true }));
         }
 
+        // ── Event submit obrolan AI ──────────────────────────────────
         document.getElementById('chat-form').addEventListener('submit', function(e) {
             e.preventDefault();
             const input     = document.getElementById('chat-input');
+            const btn       = document.getElementById('chat-send-btn');
             const container = document.getElementById('chat-messages');
             const text      = input.value.trim();
             if (!text) return;
 
-            // Tampilkan pesan pengirim langsung
-            appendMsg(container, text, false);
+            // 1. Tampilkan pesan pengguna
+            appendMsg(container, text);
             input.value = '';
+            btn.disabled = true;
 
-            // Kirim ke server
+            // 2. Tampilkan indikator mengetik AI
+            showAITypingIndicator(container);
+
+            // 3. Kirim ke api_chat.php
             fetch('api_chat.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -407,20 +428,28 @@ require_once 'koneksi.php';
             })
             .then(r => r.json())
             .then(data => {
+                removeAITypingIndicator();
+                btn.disabled = false;
                 if (data.ok) {
-                    lastMsgId = Math.max(lastMsgId, data.id);
-                    // Pesan konfirmasi otomatis
-                    setTimeout(() => {
-                        appendCSMsg(container, 'Terima kasih! Pesan Anda telah diterima dan akan segera dibalas oleh petugas siaga Poskestren Al-Bahjah.');
-                    }, 800);
+                    lastMsgId = Math.max(lastMsgId, data.id || 0);
+                    const aiReply = data.reply || 'Pesan Anda telah kami terima.';
+                    appendAIMsg(container, aiReply, data.time || '', data.sender || 'Asisten AI Poskestren');
+                } else {
+                    appendAIMsg(container, 'Mohon maaf, sistem sedang sibuk. Silakan coba kembali atau hubungi nomor darurat 0811-2233-4455.');
                 }
+            })
+            .catch(err => {
+                console.error('Chat AI error:', err);
+                removeAITypingIndicator();
+                btn.disabled = false;
+                appendAIMsg(container, 'Gagal terhubung ke server. Pastikan koneksi internet Anda aktif atau hubungi hotline kami di 0811-2233-4455.');
             });
         });
 
-        // ── Polling balasan dari CS ───────────────────────────────────
+        // ── Polling balasan realtime dari staf poskestren ─────────────
         function startPolling() {
             if (pollTimer) return;
-            pollTimer = setInterval(pollReplies, 4000);
+            pollTimer = setInterval(pollReplies, 5000);
         }
 
         function pollReplies() {
@@ -430,34 +459,85 @@ require_once 'koneksi.php';
                 if (data.ok && data.messages.length > 0) {
                     const container = document.getElementById('chat-messages');
                     data.messages.forEach(m => {
-                        appendCSMsg(container, m.pesan, m.time);
+                        appendAIMsg(container, m.pesan, m.time, 'Petugas Poskestren');
                         lastMsgId = Math.max(lastMsgId, m.id);
                     });
                 }
-            });
+            })
+            .catch(() => {});
         }
 
-        // ── Helper: tambah bubble pesan ───────────────────────────────
-        function appendMsg(container, text, isCS, time) {
-            container.insertAdjacentHTML('beforeend', `
-                <div class="flex items-start justify-end space-x-2">
-                    <div class="bg-primary-green text-white p-3 rounded-2xl rounded-tr-none text-xs max-w-[80%]">${escapeHtml(text)}</div>
-                </div>`);
+        // ── Indikator AI Sedang Mengetik ──────────────────────────────
+        function showAITypingIndicator(container) {
+            removeAITypingIndicator();
+            const html = `
+                <div id="ai-typing-indicator" class="flex items-start space-x-2">
+                    <div class="w-7 h-7 bg-primary-green text-white rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold shadow-sm">
+                        <i data-lucide="bot" class="w-4 h-4"></i>
+                    </div>
+                    <div class="bg-white px-3 py-2.5 rounded-2xl rounded-tl-none border border-border-color text-xs text-muted-text flex items-center gap-1.5 shadow-sm">
+                        <span class="w-2 h-2 rounded-full bg-primary-green animate-bounce"></span>
+                        <span class="w-2 h-2 rounded-full bg-primary-green animate-bounce [animation-delay:0.2s]"></span>
+                        <span class="w-2 h-2 rounded-full bg-primary-green animate-bounce [animation-delay:0.4s]"></span>
+                        <span class="text-[11px] text-muted-text ml-1.5 font-medium">Asisten AI sedang berpikir...</span>
+                    </div>
+                </div>`;
+            container.insertAdjacentHTML('beforeend', html);
+            lucide.createIcons();
             container.scrollTop = container.scrollHeight;
         }
 
-        function appendCSMsg(container, text, time) {
-            const t = time || new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+        function removeAITypingIndicator() {
+            const el = document.getElementById('ai-typing-indicator');
+            if (el) el.remove();
+        }
+
+        // ── Render Pesan Pengguna ─────────────────────────────────────
+        function appendMsg(container, text) {
+            const t = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
             container.insertAdjacentHTML('beforeend', `
-                <div class="flex items-start space-x-2">
-                    <div class="w-7 h-7 bg-primary-green text-white rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold">CS</div>
-                    <div class="bg-white p-3 rounded-2xl rounded-tl-none border border-border-color text-xs max-w-[80%]">
-                        <p class="font-semibold text-primary-green mb-1">Petugas Poskestren</p>
+                <div class="flex items-start justify-end space-x-2">
+                    <div class="bg-primary-green text-white p-3 rounded-2xl rounded-tr-none text-xs max-w-[85%] shadow-sm leading-relaxed">
                         ${escapeHtml(text)}
-                        <span class="block text-[10px] text-gray-400 mt-1">${t}</span>
+                        <span class="block text-[10px] text-emerald-200 text-right mt-1">${t}</span>
                     </div>
                 </div>`);
             container.scrollTop = container.scrollHeight;
+        }
+
+        // ── Render Pesan AI / CS ──────────────────────────────────────
+        function appendAIMsg(container, text, time, sender) {
+            const t = time || new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            const senderName = sender || 'Asisten AI Poskestren';
+            const formattedText = formatAIMessage(text);
+
+            container.insertAdjacentHTML('beforeend', `
+                <div class="flex items-start space-x-2">
+                    <div class="w-7 h-7 bg-primary-green text-white rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold shadow-sm">
+                        <i data-lucide="bot" class="w-4 h-4"></i>
+                    </div>
+                    <div class="bg-white p-3 rounded-2xl rounded-tl-none border border-border-color text-xs text-text-main max-w-[85%] shadow-sm">
+                        <p class="font-semibold text-primary-green mb-1 flex items-center gap-1">
+                            <span>${escapeHtml(senderName)}</span>
+                            <span class="text-[9px] bg-emerald-50 text-emerald-700 px-1 py-0.2 rounded border border-emerald-200">AI</span>
+                        </p>
+                        <div class="leading-relaxed space-y-1">${formattedText}</div>
+                        <span class="block text-[10px] text-gray-400 mt-1.5">${t}</span>
+                    </div>
+                </div>`);
+            lucide.createIcons();
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function formatAIMessage(text) {
+            if (!text) return '';
+            // Escape HTML dulu untuk keamanan XSS
+            let safe = escapeHtml(text);
+            // Format bold **teks** -> <strong>teks</strong>
+            safe = safe.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-deep-green">$1</strong>');
+            // Format baris baru
+            safe = safe.replace(/\n/g, '<br>');
+            return safe;
         }
 
         function escapeHtml(text) {
