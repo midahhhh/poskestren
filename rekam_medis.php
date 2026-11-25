@@ -219,6 +219,23 @@ $q_ready = $conn->query(
          ELSE 3 END ASC,
          k.skor_saw_akhir DESC, k.id ASC LIMIT 25"
 );
+
+// Pasien yang Sudah Selesai Diperiksa Dokter (Arsip EMR)
+$q_selesai = $conn->query(
+    "SELECT pk.id as pemeriksaan_id, pk.tekanan_darah, pk.suhu_tubuh, pk.nadi, pk.laju_respirasi,
+            pk.saturasi_oksigen, pk.diagnosa_dokter, pk.tindakan_pertama, pk.rekomendasi_rawat,
+            k.id as kunjungan_id, k.no_antrean, k.tanggal_berobat, k.keluhan_utama,
+            k.status_antrean, k.tingkat_prioritas, k.skor_saw_akhir, k.dokter_pemeriksa,
+            s.id as santri_id, s.nama_lengkap, s.nis, s.kamar_asrama, s.kompleks_asrama, s.jenis_kelamin,
+            u.nama_lengkap as nama_nakes_akun,
+            (SELECT COUNT(*) FROM resep_obat_detail rod JOIN resep_obat ro ON rod.resep_id = ro.id WHERE ro.kunjungan_id = k.id) as jumlah_obat
+     FROM pemeriksaan_klinis pk
+     JOIN kunjungan_sakit k ON pk.kunjungan_id = k.id
+     JOIN santri s ON k.santri_id = s.id
+     LEFT JOIN users u ON pk.petugas_id = u.id
+     ORDER BY k.id DESC LIMIT 25"
+);
+$cnt_selesai = $q_selesai ? $q_selesai->num_rows : 0;
 ?>
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
@@ -467,6 +484,112 @@ $q_ready = $conn->query(
                             <tr>
                                 <td colspan="6" class="py-8 text-center text-[#64756D]">
                                     Tidak ada pasien yang menunggu pemeriksaan saat ini.
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ========================================================== -->
+        <!-- VIEW 1B: ARSIP REKAM MEDIS SANTRI YANG SUDAH DIPERIKSA     -->
+        <!-- ========================================================== -->
+        <div class="card-panel p-4 space-y-3.5 mt-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#DCE7E0] gap-2">
+                <div>
+                    <h2 class="font-bold text-sm text-[#0B3D2E] flex items-center gap-2">
+                        <span>Riwayat Pasien Selesai Diperiksa (Arsip EMR)</span>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300"><?= $cnt_selesai; ?> Pasien</span>
+                    </h2>
+                    <p class="text-xs text-[#64756D]">Daftar santri yang telah mendapatkan tindakan medis, diagnosis klinis, dan resep dokter.</p>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-[#F5F8F6] text-[#0B3D2E] font-bold border-b border-[#DCE7E0]">
+                            <th class="py-2.5 px-3">No. Antrean & Tgl</th>
+                            <th class="py-2.5 px-3">Identitas Santri</th>
+                            <th class="py-2.5 px-3">Dokter Pemeriksa</th>
+                            <th class="py-2.5 px-3">Diagnosis Medis & Keluhan</th>
+                            <th class="py-2.5 px-3">Tanda Vital (TTV)</th>
+                            <th class="py-2.5 px-3">Disposisi Rawat</th>
+                            <th class="py-2.5 px-3 text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#DCE7E0] text-[#182923]">
+                        <?php if ($q_selesai && $q_selesai->num_rows > 0): ?>
+                            <?php while ($qs = $q_selesai->fetch_assoc()): ?>
+                            <tr class="hover:bg-slate-50/70 transition">
+                                <td class="py-2.5 px-3">
+                                    <span class="mono-num font-bold text-xs text-[#0B3D2E] block">
+                                        <?= htmlspecialchars($qs['no_antrean'] ?: 'ANT-'.$qs['kunjungan_id']); ?>
+                                    </span>
+                                    <span class="text-[10px] text-[#64756D] block">
+                                        <?= date('d F Y', strtotime($qs['tanggal_berobat'])); ?>
+                                    </span>
+                                    <div class="mt-1">
+                                        <?= badge_triase($qs['tingkat_prioritas'], $qs['skor_saw_akhir']); ?>
+                                    </div>
+                                </td>
+                                <td class="py-2.5 px-3">
+                                    <span class="font-bold text-[#0B3D2E] block"><?= htmlspecialchars($qs['nama_lengkap']); ?></span>
+                                    <span class="mono-num text-[10px] text-[#64756D]">NIS: <?= $qs['nis']; ?> • <?= $qs['jenis_kelamin'] == 'L' ? 'Putra' : 'Putri'; ?></span>
+                                    <span class="block text-[10px] text-emerald-800 font-medium"><?= htmlspecialchars($qs['kamar_asrama'] ?? '-'); ?> (<?= $qs['kompleks_asrama']; ?>)</span>
+                                </td>
+                                <td class="py-2.5 px-3 text-[#182923]">
+                                    <strong class="block text-xs"><?= htmlspecialchars($qs['dokter_pemeriksa'] ?: ($qs['nama_nakes_akun'] ?: 'Dokter Poskestren')); ?></strong>
+                                    <span class="text-[10px] text-[#64756D]">SIP / STR Terdaftar</span>
+                                </td>
+                                <td class="py-2.5 px-3 max-w-[260px]">
+                                    <span class="font-bold text-[#0B3D2E] block"><?= htmlspecialchars($qs['diagnosa_dokter'] ?: 'Pemeriksaan Rutin'); ?></span>
+                                    <span class="text-[11px] text-[#64756D] block">Keluhan: <?= htmlspecialchars($qs['keluhan_utama']); ?></span>
+                                    <?php if ((int)$qs['jumlah_obat'] > 0): ?>
+                                    <span class="inline-flex items-center gap-1 mt-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                                        💊 <?= (int)$qs['jumlah_obat']; ?> Macam Obat Diresepkan
+                                    </span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="py-2.5 px-3">
+                                    <span class="mono-num font-bold text-xs <?= (float)$qs['suhu_tubuh'] >= 38.0 ? 'text-red-600' : 'text-emerald-700'; ?> block">
+                                        <?= number_format((float)$qs['suhu_tubuh'], 1); ?> °C
+                                    </span>
+                                    <span class="mono-num text-[10px] text-[#64756D] block">TD: <?= htmlspecialchars($qs['tekanan_darah'] ?: '120/80'); ?></span>
+                                    <span class="mono-num text-[10px] text-emerald-800 block">SpO2: <?= (int)$qs['saturasi_oksigen']; ?>%</span>
+                                </td>
+                                <td class="py-2.5 px-3">
+                                    <?php 
+                                    $rw = $qs['rekomendasi_rawat'];
+                                    $rw_cls = 'bg-slate-100 text-slate-800 border-slate-300';
+                                    if ($rw === 'Rawat Jalan') $rw_cls = 'bg-emerald-100 text-emerald-900 border-emerald-300';
+                                    if ($rw === 'Rawat Inap Poskestren') $rw_cls = 'bg-amber-100 text-amber-900 border-amber-300';
+                                    if ($rw === 'Rujuk RS') $rw_cls = 'bg-red-100 text-red-900 border-red-300';
+                                    ?>
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold border <?= $rw_cls; ?>">
+                                        <?= htmlspecialchars($rw); ?>
+                                    </span>
+                                </td>
+                                <td class="py-2.5 px-3 text-right">
+                                    <div class="inline-flex items-center gap-1">
+                                        <a href="rekam_medis.php?kunjungan_id=<?= $qs['kunjungan_id']; ?>&action=lihat" 
+                                           class="px-2.5 py-1 rounded-lg bg-[#0B3D2E] hover:bg-[#16845B] text-white font-semibold text-[11px] transition inline-flex items-center gap-1 shadow-2xs">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            <span>Lihat EMR</span>
+                                        </a>
+                                        <a href="rekam_medis.php?kunjungan_id=<?= $qs['kunjungan_id']; ?>&action=edit" 
+                                           class="px-2 py-1 rounded-lg border border-[#DCE7E0] hover:bg-slate-100 text-[#0B3D2E] font-semibold text-[11px] transition">
+                                            Edit
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php endwhile; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="7" class="py-8 text-center text-[#64756D]">
+                                    Belum ada arsip riwayat rekam medis santri yang selesai diperiksa.
                                 </td>
                             </tr>
                         <?php endif; ?>
